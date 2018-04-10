@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="tlh"> <!-- Heghlu’meH QaQ jajvam. -->
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>GnomeHat</title>
+  <meta name="description" content="GnomeHat Main Page">
+  <meta name="author" content="GnomeHat">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="static/css/normalize.css">
+  <link rel="stylesheet" href="static/css/skeleton.css">
+  <link rel="stylesheet" href="static/css/font-awesome.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="static/images/favicon.png">
+
+  <style>
+body {
+  color: #eeeeee;
+  background-color: #272727;
+}
+i {
+  float: left;
+  padding: 10px;
+  width: 32px;
+}
+i:hover {
+  font-weight: bold;
+}
+
+@keyframes shiny {
+     0%{background-position:0% 50%}
+     100%{background-position:100% 50%}
+}
+
+.gradient {
+  border-radius: 5px;
+  width: 100%;
+  overflow:hidden;
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+.gradient img {
+  -webkit-mask-image: -webkit-gradient(linear, left top, right bottom, from(rgba(0,0,0,0)), to(rgba(0,0,0,1)));
+}
+
+.gradient * {
+  color: white;
+  z-index: 1;
+}
+.buttons {
+  padding: 12px;
+}
+.content {
+  padding: 12px;
+}
+.orangeish {
+  background: linear-gradient(45deg, #b74e13, #7a340c, #b74e13, #7a340c, #b74e13);
+  background-size: 400% 100%;
+  animation-name: shiny;
+  animation-duration: 11s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate-reverse;
+}
+.orangeish:nth-child(2n) { animation-duration: 7s; }
+.orangeish:nth-child(3n) { animation-duration: 13s; }
+
+.blueish {
+  background-image: linear-gradient(45deg, #4444aa, #eeeeee);
+}
+.greenish {
+  background-image: linear-gradient(45deg, #44aa44, #eeeeee);
+}
+.reddish {
+  background-image: linear-gradient(45deg, #aa4444, #eeeeee);
+}
+.big {
+  font-size: 1.4em;
+}
+.img_holder {
+  float: right;
+  overflow: hidden;
+  line-height: 0;
+  position: relative;
+  z-index: 0;
+}
+.search {
+    width: 100%;
+    color: #121212;
+}
+.experimentParams {
+    width: 100%;
+    color: #121212;
+}
+.paramlist {
+    width: 100%;
+}
+  </style>
+  <script>
+function filterResults() {
+    var input = document.getElementById("resultSearchInput");
+    var filter = input.value.toUpperCase();
+    var resultsList = document.getElementById("resultsList");
+    var results = resultsList.getElementsByClassName("gradient");
+
+    var visibleCount = 0;
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < results.length; i++) {
+        div = results[i];
+        if (div.innerHTML.toUpperCase().indexOf(filter) > -1) {
+            div.style.display = "block";
+            visibleCount++;
+        } else {
+            div.style.display = "none";
+        }
+    }
+    if (visibleCount < results.length) {
+        setResultText('Displaying ' + visibleCount + ' of ');
+    } else {
+        setResultText('');
+    }
+}
+
+function setResultText(text) {
+    var resultText = document.getElementById("resultDisplayCount");
+    resultText.innerHTML = text;
+}
+
+  </script>
+
+</head>
+<body>
+  <div class="container">
+    <br>
+    <div class="row" id="results">
+      <div class="column" id="resultsList">
+        <h4>Results</h4>
+        <span id="resultDisplayCount"></span>
+        {{ results | length }} recent results. &nbsp
+        <a href="http://files.deeplearninggroup.com">View Older Results</a>
+        <br>
+        <input class="search" type="text" id="resultSearchInput" onkeyup="filterResults()" placeholder="Search for results..">
+        <br>
+        {% for result in results: %}
+        <div class="gradient {{result['color']}}">
+          <div class="content" style="float: left">
+            <div>
+            <a href="http://files.deeplearninggroup.com/{{ result['dir_name'] }}">
+              {% if result['finished']: %}
+              <i class="fa fa-cloud-download" aria-hidden="true"></i>
+              {% else %}
+              <i class="fa fa-clock-o" aria-hidden="true"></i>
+              {% endif %}
+            </a>
+            <a onclick="deleteResult('{{result['dir_name']}}')">
+              <i class="fa fa-trash-o"></i>
+            </a>
+            </div>
+            <a href="experiment/{{ result['dir_name'] }}">
+              <span class=big style="position: absolute;" >
+                {{ result['headline'] }}
+                <br>
+                {{ result['subtitle'] }}
+              </span>
+            </a>
+          </div>
+          <div class="img_holder" height=128>
+              <img src="{{result['image_url']}}" height=128 />
+          </div>
+          <br>
+        </div>
+          {% if result['last_log_summary'] and result['color'] == 'orangeish': %}
+          <br>
+          <pre>{{ result['last_log_summary'] }}</pre>
+          {%endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+<script>
+var experimentParams = document.getElementsByClassName("experimentParams");
+
+function toggleDisplay(elementId) {
+    var element = document.getElementById(elementId);
+    if (element.style.display === 'none') {
+        element.style.display = 'block';
+    } else {
+        element.style.display = 'none';
+    }
+}
+function deleteResult(resultName) {
+    if (confirm("Are you sure you want to delete " + resultName)) {
+        console.log("DELETING");
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'delete_job');
+        xhr.onload = function() {
+            console.log(xhr.responseText);
+        }
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            'id': resultName
+        }));
+    } else {
+        console.log("NOT DELETING");
+    }
+}
+</script>
+</html>

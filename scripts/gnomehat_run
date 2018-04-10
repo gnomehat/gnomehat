@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+# Creates a snapshot copy of this repository in target_dir
+# The copy should include any uncommitted or unstaged changes
+# (This makes experiments reproducible, even if they're not checked in)
+import argparse
+import os
+import sys
+import uuid
+import os
+import subprocess
+import shutil
+import requests
+
+from gnomehat import hostinfo
+
+
+
+def mkdirp(path):
+    os.makedirs(path, exist_ok=True)
+
+
+def make_experiment_name():
+    dataset_name = 'experiment'
+    random_hex = uuid.uuid4().hex[:8]
+    return '{}_{}'.format(dataset_name, random_hex)
+
+
+def make_target_dir(experiments_dir, experiment_name):
+    return os.path.join(experiments_dir, experiment_name)
+
+
+def copy_repo(target_dir):
+    # Check that this is a git repository
+    try:
+        subprocess.check_output(['git', 'describe', '--always'])
+    except subprocess.CalledProcessError:
+        print('Error: {} must be a git repository'.format(os.getcwd()))
+        exit(1)
+
+    # Get the list of tracked filenames in the current repo
+    stdout = subprocess.check_output(['git', 'ls-files'])
+    filenames = str(stdout, 'utf-8').splitlines()
+
+    # Copy those files to target_dir
+    for src_filename in filenames:
+        dst_filename = os.path.join(target_dir, src_filename)
+        mkdirp(os.path.dirname(dst_filename))
+        shutil.copy2(src_filename, dst_filename)
+    print('Copied {} files to {}'.format(len(filenames), target_dir))
+
+
+def build_start_sh(options):
+    # TODO: Replace this with something more structured
+    return '''#!/bin/bash
+if [ -f requirements.txt ]; then
+  pip install -r requirements.txt
+fi
+script -q -c '{} {}' /dev/null
+'''.format(options['executable'], ' '.join(options['args']))
+
+
+def chmodx(filename):
+    import os
+    import stat
+    st = os.stat(filename)
+    os.chmod(filename, st.st_mode | stat.S_IEXEC)
+
+
+def parse_args():
+    if '--help' in sys.argv or len(sys.argv) < 2:
+        print('Usage:\n\t{} main.py [--arg2] [arg3 ...]'.format(sys.argv[0]))
+        exit(1)
+    options = {}
+    options['executable'] = sys.argv[1]
+    options['args'] = sys.argv[2:]
+
+    if options['executable'] == 'python':
+        print('Executing Python script with args: {}'.format(options['args']))
+
+    # TODO: Check args, maybe run pyflakes
+    return options
+
+
+def get_experiments_dir():
+    # HACK: Assume we're running on the same machine as the server
+    # HACK: Assume port 8086
+    # TODO: Configure this, but which way is best?
+    url = 'http://localhost:8086/info'
+    info = requests.get(url).json()
+    return info['experiments_dir']
+
+
+if __name__ == '__main__':
+    options = parse_args()
+
+    # First, ensure that Gnomehat is running
+    experiments_dir = get_experiments_dir()
+    if experiments_dir is None:
+        experiments_dir = input('Input an experiments directory:\n> ')
+    print('Using experiments_dir {}'.format(experiments_dir))
+
+    # Create a copy of this experiment in target_dir
+    experiment_name = make_experiment_name()
+    target_dir = make_target_dir(experiments_dir, experiment_name)
+    copy_repo(target_dir)
+
+    # In target_dir ./start.sh if it does not exist
+    os.chdir(target_dir)
+    if os.path.exists('./start.sh'):
+        print('Using ./start.sh to run experiment')
+    else:
+        print('Creating {}/start.sh'.format(target_dir))
+        with open('start.sh', 'w') as fp:
+            fp.write(build_start_sh(options))
+        chmodx('start.sh')
+
+    gui_url = hostinfo.get_hostinfo(experiments_dir).get('gui_url')
+    if gui_url:
+        print("See results at {}/experiment/{}".format(gui_url, experiment_name))
+    else:
+        print("Error: Cannot read {}/hostinfo.json, please restart server".format(experiments_dir))
+

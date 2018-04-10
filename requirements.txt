@@ -1,0 +1,10 @@
+numpy
+scipy
+Pillow
+Flask
+nose
+rq
+pytest
+pytz
+docopt
+requests

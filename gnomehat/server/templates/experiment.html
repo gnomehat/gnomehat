@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Experiment Details</title>
+  <meta name="description" content="GnomeHat Experiment">
+  <meta name="author" content="GnomeHat">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="/static/css/normalize.css">
+  <link rel="stylesheet" href="/static/css/skeleton.css">
+  <link rel="stylesheet" href="/static/css/font-awesome.css">
+
+  <script type="text/javascript" src="/static/ws-repl.js"></script>
+
+  <style>
+body {
+  color: #eeeeee;
+  background-color: #272727;
+}
+#repl {
+  width: 100%;
+  background-color: #0a0a0a;
+}
+
+.slider {
+  overflow-x: scroll;
+}
+.holder {
+  width: 500%;
+}
+.slide {
+  float: left;
+  height: 256px;
+  position: relative;
+  background-position: -100px 0;
+}
+.slide:before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>Experiment {{experiment_id}}</h1>
+
+    <h4>Console</h4>
+    <div id="repl" width=1024px></div>
+
+    <h4>Visualizations</h4>
+    Found {{ image_groups | length }} image groups.
+
+    {% for visualization in image_groups: %}
+    <div class="row">
+        <h3>{{ visualization['name'] }}</h3>
+
+        {% for image_url in visualization['url_latest_5'] %}
+            <div>
+                <a href={{image_url}}>{{image_url}}</a>
+                <img style="max-width:100%" src="{{ image_url }}"></img>
+            </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+  </div>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+<script>
+function toggleDisplay(elementId) {
+    var element = document.getElementById(elementId);
+    if (element.style.display === 'none') {
+        element.style.display = 'block';
+    } else {
+        element.style.display = 'none';
+    }
+}
+
+wsrepl({serverName: '{{ websocket_host }}', port: {{ websocket_port }} });
+</script>
+</html>

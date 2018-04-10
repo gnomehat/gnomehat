@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+import flask
+import json
+import rq
+import sys
+from gnomehat import server
+from gnomehat import hostinfo
+
+
+if __name__ == '__main__':
+    experiments_dir = sys.argv[1]
+    config = {
+        'DEBUG': False,
+        'GNOMEHAT_HOST': '0.0.0.0',
+        'GNOMEHAT_PORT': 8086,
+        'MAX_RESULTS': 100,
+        'IMAGE_EXTENSIONS': set(['jpg', 'png', 'tiff', 'bmp', 'gif']),
+        'EXPERIMENTS_DIR': experiments_dir,
+    }
+    hostinfo.init_hostinfo(config)
+    server.run(config)

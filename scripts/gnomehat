@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+import os
+import sys
+import subprocess
+import socket
+from gnomehat import sysinfo
+from gnomehat import hostinfo
+
+# The system consists of one server process (the GUI) and many workers
+# One worker should be alive per GPU of any connected machine
+def gnomehat_start(experiments_dir):
+    # Check the server, restart it if needed
+    if hostinfo.server_ok(experiments_dir):
+        print('Host: Nothing to do, server is already running')
+    else:
+        run_server(experiments_dir)
+
+    # HACK: kill and restart all the workers
+    # TODO: proper daemonization, maybe supervisord, maybe upstart?
+    print('Killing all workers...')
+    os.system('pkill -Pf gnomehat_worker')
+    print('All workers killed')
+
+    # For each GPU, generate a worker with CUDA_VISIBLE_DEVICES set
+    gpus = sysinfo.get_gpu_info()
+    print('Starting workers on {} GPUs...'.format(len(gpus)))
+    for gpu_idx, gpu in enumerate(gpus):
+        run_worker(experiments_dir, gpu_idx)
+        print('Started worker for {} (PCI {})'.format(gpu['name'], gpu['pci_width']))
+    print('All workers started')
+
+
+def run_worker(experiments_dir, gpu_idx):
+    print('Starting worker for GPU {}...'.format(gpu_idx))
+    # HACK: nohup with output redirected instead of a proper daemon
+    # Redirect stdout and stderr to a worker log file
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_idx)
+    log_filename = '{}/worker_{}_{}.txt'.format(experiments_dir, socket.gethostname(), gpu_idx)
+    cmd = 'nohup gnomehat_worker {} > {} 2>&1 &'.format(experiments_dir, log_filename)
+    os.system(cmd)
+    print('Worker {} running'.format(gpu_idx))
+
+
+def run_server(experiments_dir):
+    print('Starting server at {}...'.format(experiments_dir))
+    cmd = 'nohup gnomehat_server {0} > {0}/server.txt 2>&1 &'.format(experiments_dir)
+    os.system(cmd)
+    print('Server running')
+
+
+def gnomehat_stop():
+    # TODO: Send a special signal maybe?
+    os.system('pkill -Pf gnomehat')
+    # TODO: Mark jobs as cancelled so they don't stay eternally 'still running'
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('Usage: gnomehat [start|stop] <experiments_dir>')
+        exit(1)
+    command = sys.argv[1]
+    if command == 'start':
+        if len(sys.argv) < 3:
+            print('Usage: gnomehat start <experiments_dir>')
+            exit(1)
+        experiments_dir = sys.argv[2]
+        gnomehat_start(experiments_dir)
+    elif command == 'stop':
+        print('Terminating all gnomehat processes...')
+        gnomehat_stop()
+    elif command == 'status':
+        print('Status:')
+        os.system('pgrep -a gnomehat')
+    else:
+        # If the user runs 'gnomehat train.py' just do it
+        subprocess.check_output(['gnomehat_run'] + sys.argv[1:])
