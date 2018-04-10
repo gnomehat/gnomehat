@@ -2,8 +2,8 @@
 # Creates a snapshot copy of this repository in target_dir
 # The copy should include any uncommitted or unstaged changes
 # (This makes experiments reproducible, even if they're not checked in)
-import argparse
 import os
+import stat
 import sys
 import uuid
 import os
@@ -14,15 +14,14 @@ import requests
 from gnomehat import hostinfo
 
 
-
 def mkdirp(path):
     os.makedirs(path, exist_ok=True)
 
 
-def make_experiment_name():
-    dataset_name = 'experiment'
+def make_experiment_name(experiment_dir):
+    repository_name = os.getcwd().split('/')[-1]
     random_hex = uuid.uuid4().hex[:8]
-    return '{}_{}'.format(dataset_name, random_hex)
+    return '{}_{}'.format(repository_name, random_hex)
 
 
 def make_target_dir(experiments_dir, experiment_name):
@@ -34,7 +33,12 @@ def copy_repo(target_dir):
     try:
         subprocess.check_output(['git', 'describe', '--always'])
     except subprocess.CalledProcessError:
-        print('Error: {} must be a git repository'.format(os.getcwd()))
+        print('Error: {} is not a git repository'.format(os.getcwd()))
+        print('To use gnomehat, make sure your source code is checked into git')
+        print('To initialize a git repository, use:')
+        print('    git init .')
+        print('    git add file1.py file2.py ...')
+        print('    git commit')
         exit(1)
 
     # Get the list of tracked filenames in the current repo
@@ -60,24 +64,29 @@ script -q -c '{} {}' /dev/null
 
 
 def chmodx(filename):
-    import os
-    import stat
     st = os.stat(filename)
     os.chmod(filename, st.st_mode | stat.S_IEXEC)
 
 
 def parse_args():
     if '--help' in sys.argv or len(sys.argv) < 2:
-        print('Usage:\n\t{} main.py [--arg2] [arg3 ...]'.format(sys.argv[0]))
+        print('Usage:\n\tgnomehat_run <my_experiment.py> [--my-args ...]')
         exit(1)
+
     options = {}
-    options['executable'] = sys.argv[1]
-    options['args'] = sys.argv[2:]
+    if sys.argv[1] == '-m':
+        options['message'] = sys.argv[2]
+        options['executable'] = sys.argv[3]
+        options['args'] = sys.argv[4:]
+    else:
+        options['message'] = ''
+        options['executable'] = sys.argv[1]
+        options['args'] = sys.argv[2:]
 
     if options['executable'] == 'python':
         print('Executing Python script with args: {}'.format(options['args']))
+        # TODO: run pyflakes maybe?
 
-    # TODO: Check args, maybe run pyflakes
     return options
 
 
@@ -100,7 +109,7 @@ if __name__ == '__main__':
     print('Using experiments_dir {}'.format(experiments_dir))
 
     # Create a copy of this experiment in target_dir
-    experiment_name = make_experiment_name()
+    experiment_name = make_experiment_name(experiments_dir)
     target_dir = make_target_dir(experiments_dir, experiment_name)
     copy_repo(target_dir)
 

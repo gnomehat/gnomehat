@@ -74,7 +74,7 @@ if __name__ == '__main__':
         print('\tgnomehat start [experiments_dir]')
         print('\tgnomehat stop')
         print('\tgnomehat status')
-        print('\tgnomehat <my_experiment.py> --my-options')
+        print('\tgnomehat [-m message] <my_experiment.py> [--my-options ...]')
         exit(1)
     command = sys.argv[1]
     if command == 'start':
@@ -95,8 +95,8 @@ if __name__ == '__main__':
         print('Terminating all gnomehat processes...')
         gnomehat_stop()
     elif command == 'status':
-        print('Status:')
+        print('The following gnomehat processes are running:')
         os.system('pgrep -a gnomehat')
     else:
-        # If the user runs 'gnomehat train.py' just do it
-        subprocess.check_output(['gnomehat_run'] + sys.argv[1:])
+        # The command 'gnomehat train.py' is an alias for gnomehat_run
+        subprocess.run(['gnomehat_run'] + sys.argv[1:])
