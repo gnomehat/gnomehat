@@ -4,17 +4,15 @@ import json
 import socket
 import requests
 
-GNOMEHAT_SERVER_URL = os.environ.get('GNOMEHAT_SERVER_URL')
-
 
 def init_hostinfo(config):
     experiments_dir = config['EXPERIMENTS_DIR']
     port = config['GNOMEHAT_PORT']
-    print("Initializing an experiment runner in {}".format(experiments_dir))
+    print("Generating {}/hostinfo.json".format(experiments_dir))
 
     # export GNOMEHAT_SERVER_URL=thismachine.mydomain.com to start a cluster
-    if GNOMEHAT_SERVER_URL:
-        hostname = gnomehat_server_url
+    if os.environ.get('GNOMEHAT_SERVER_URL'):
+        hostname = os.environ.get('GNOMEHAT_SERVER_URL')
     else:
         hostname = socket.gethostname()
     info = {

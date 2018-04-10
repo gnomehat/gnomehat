@@ -19,43 +19,39 @@ def gnomehat_start(experiments_dir):
     # TODO: proper daemonization, maybe supervisord, maybe upstart?
     print('Killing all workers...')
     os.system('pkill -f gnomehat_worker')
-    print('All workers killed')
+    print('All workers killed, ready to relaunch.')
 
     # For each GPU, generate a worker with CUDA_VISIBLE_DEVICES set
     gpus = sysinfo.get_gpu_info()
-    print('Found {} GPUs'.format(len(gpus)))
-    print('Starting workers on {} GPUs...'.format(len(gpus)))
     for gpu_idx, gpu in enumerate(gpus):
+        print('Starting worker for GPU {} ({})...'.format(gpu_idx, gpu['name']))
         run_worker(experiments_dir, gpu_idx)
-        print('Started worker for {} (PCI {})'.format(gpu['name'], gpu['pci_width']))
+        print('Started worker for GPU {}'.format(gpu_idx))
     print('All workers started')
     self_check(experiments_dir)
 
 
 def self_check(experiments_dir):
-    print('GnomeHat running self-check')
+    print('GnomeHat running self-check...')
     info = hostinfo.get_hostinfo(experiments_dir)
-    print(info)
-    print('GnomeHat UI is now running at {}'.format(info['gui_url']))
+    print('GnomeHat UI is now running at:')
+    print('\t{}'.format(info['gui_url']))
 
 
 def run_worker(experiments_dir, gpu_idx):
-    print('Starting worker for GPU {}...'.format(gpu_idx))
     # HACK: nohup with output redirected instead of a proper daemon
     # Redirect stdout and stderr to a worker log file
-
     os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_idx)
     log_filename = '{}/worker_{}_{}.txt'.format(experiments_dir, socket.gethostname(), gpu_idx)
     cmd = 'nohup gnomehat_worker {} > {} 2>&1 &'.format(experiments_dir, log_filename)
     os.system(cmd)
-    print('Worker {} running'.format(gpu_idx))
 
 
 def run_server(experiments_dir):
     print('Starting server at {}...'.format(experiments_dir))
     cmd = 'nohup gnomehat_server {0} > {0}/server.txt 2>&1 &'.format(experiments_dir)
     os.system(cmd)
-    print('Server running')
+    print('Server started at {}'.format(experiments_dir))
 
 
 def gnomehat_stop():
