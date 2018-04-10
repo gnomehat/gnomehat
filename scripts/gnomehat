@@ -18,7 +18,7 @@ def gnomehat_start(experiments_dir):
     # HACK: kill and restart all the workers
     # TODO: proper daemonization, maybe supervisord, maybe upstart?
     print('Killing all workers...')
-    os.system('pkill -Pf gnomehat_worker')
+    os.system('pkill -f gnomehat_worker')
     print('All workers killed')
 
     # For each GPU, generate a worker with CUDA_VISIBLE_DEVICES set
@@ -51,7 +51,7 @@ def run_server(experiments_dir):
 
 def gnomehat_stop():
     # TODO: Send a special signal maybe?
-    os.system('pkill -Pf gnomehat')
+    os.system('pkill -f gnomehat')
     # TODO: Mark jobs as cancelled so they don't stay eternally 'still running'
 
 
