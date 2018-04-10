@@ -127,7 +127,8 @@ if __name__ == '__main__':
 
     gui_url = hostinfo.get_hostinfo(experiments_dir).get('gui_url')
     if gui_url:
-        print("See results at {}/experiment/{}".format(gui_url, experiment_name))
+        print("\nSee results at:")
+        print("\t{}/experiment/{}\n".format(gui_url, experiment_name))
     else:
         print("Error: Cannot read {}/hostinfo.json, please restart server".format(experiments_dir))
 
