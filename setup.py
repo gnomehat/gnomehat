@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='gnomehat',
-        version='0.1',
+        version='0.2.0',
         description='GnomeHat makes it easy to run experiments.',
         author='Larry Neal',
         author_email='nealla@lwneal.com',
