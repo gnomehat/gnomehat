@@ -21,7 +21,7 @@ def get_files_url():
 
 
 def default_image_url():
-    return os.path.join(get_files_url(), 'kitty.jpg')
+    return os.path.join(flask.request.url_root, '/static/images/default.png')
 
 
 def websocket_host():
@@ -92,9 +92,9 @@ def get_results():
             command = lines[-1].replace("script -q -c '", '').replace("' /dev/null", "")
             headline = '{}: {}'.format(experiment_name.title(), command)
 
-        params = get_params(dir_path)
-        if 'hypothesis' in params:
-            subtitle = params['hypothesis']
+        notes = get_notes(dir_path)
+        if notes:
+            subtitle = notes
         else:
             subtitle = stdout_last_n_lines(dir_name, n=1)
             if len(subtitle) > 128:
@@ -109,7 +109,6 @@ def get_results():
             'last_modified_timestamp': timestamp,
             'started_at': started_at.strftime('%a %I:%M%p'),
             'finished': finished_job,
-            'params': get_params(dir_path),
             'color': color,
             'image_url': image_url,
             'last_log_summary': get_log_summary(dir_name),
@@ -120,14 +119,11 @@ def get_results():
     return sorted(results, key=lambda x: x['last_modified_timestamp'], reverse=True)
 
 
-def get_params(dir_path, text=False):
-    params = {}
-    params_filename = os.path.join(dir_path, 'params.json')
-    if os.path.exists(params_filename):
-        params = json.load(open(params_filename))
-    if text:
-        return json.dumps(params, indent=2)
-    return params
+def get_notes(dir_path):
+    notes_filename = os.path.join(dir_path, 'gnomehat_notes.txt')
+    if os.path.exists(notes_filename):
+        return open(notes_filename).read()
+    return ''
 
 
 def stdout_last_n_lines(dir_name, n):
@@ -204,7 +200,6 @@ def view_experiment(experiment_id):
         'experiment_id': experiment_id,
         'image_groups': image_groups,
         'last_log': get_log_summary(experiment_id),
-        'parameters': get_params(dir_path, text=True),
         'websocket_host': websocket_host(),
         'websocket_port': port,
     }

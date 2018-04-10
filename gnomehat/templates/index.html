@@ -141,9 +141,15 @@ function setResultText(text) {
 <body>
   <div class="container">
     <br>
+    <div class="row" id="header">
+      <center>
+        <img src="/static/images/default.png"></img>
+        <span style="font-size: 30pt">GnomeHat Experiments</span>
+        <img src="/static/images/default.png" style="transform: scaleX(-1);"></img>
+      </center>
+    </div>
     <div class="row" id="results">
       <div class="column" id="resultsList">
-        <h4>Results</h4>
         <span id="resultDisplayCount"></span>
         {{ results | length }} recent results. &nbsp
         <a href="http://files.deeplearninggroup.com">View Older Results</a>
