@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import socket
+import time
 from gnomehat import sysinfo
 from gnomehat import hostinfo
 
@@ -33,6 +34,7 @@ def gnomehat_start(experiments_dir):
 
 def self_check(experiments_dir):
     print('GnomeHat running self-check...')
+    time.sleep(2)
     info = hostinfo.get_hostinfo(experiments_dir)
     print('GnomeHat UI is now running at:')
     print('\t{}'.format(info['gui_url']))
