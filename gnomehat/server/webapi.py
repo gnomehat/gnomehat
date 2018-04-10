@@ -83,19 +83,20 @@ def get_results():
 
         is_experiment = 'start.sh' in dir_contents
 
-        experiment_name = experiment_id.split('_')[0]
+        experiment_name = experiment_id[:-8].replace('_', ' ').replace('-', ' ')
         headline = experiment_name.title()
         if is_experiment:
             start_path = os.path.join(full_path, 'start.sh')
             lines = open(start_path).readlines()
             # TODO: hack; this should come from eg. worker_started
-            headline = lines[-1].replace('stdbuf -i0 -o0 -e0', '')
+            command = lines[-1].replace("script -q -c '", '').replace("' /dev/null", "")
+            headline = '{}: {}'.format(experiment_name.title(), command)
 
         params = get_params(dir_path)
         if 'hypothesis' in params:
             subtitle = params['hypothesis']
         else:
-            subtitle = stdout_last_n_lines(dir_name, n=2)
+            subtitle = stdout_last_n_lines(dir_name, n=1)
             if len(subtitle) > 128:
                 subtitle = subtitle[:128] + '...'
 
