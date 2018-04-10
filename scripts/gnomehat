@@ -23,11 +23,20 @@ def gnomehat_start(experiments_dir):
 
     # For each GPU, generate a worker with CUDA_VISIBLE_DEVICES set
     gpus = sysinfo.get_gpu_info()
+    print('Found {} GPUs'.format(len(gpus)))
     print('Starting workers on {} GPUs...'.format(len(gpus)))
     for gpu_idx, gpu in enumerate(gpus):
         run_worker(experiments_dir, gpu_idx)
         print('Started worker for {} (PCI {})'.format(gpu['name'], gpu['pci_width']))
     print('All workers started')
+    self_check(experiments_dir)
+
+
+def self_check(experiments_dir):
+    print('GnomeHat running self-check')
+    info = hostinfo.get_hostinfo(experiments_dir)
+    print(info)
+    print('GnomeHat UI is now running at {}'.format(info['gui_url']))
 
 
 def run_worker(experiments_dir, gpu_idx):
@@ -55,16 +64,36 @@ def gnomehat_stop():
     # TODO: Mark jobs as cancelled so they don't stay eternally 'still running'
 
 
+def check_gpus():
+    gpus = sysinfo.get_gpu_info()
+    print('GnomeHat initializing...')
+    print('Found {} GPUs:'.format(len(gpus)))
+    for gpu in gpus:
+        print('\t{} PCI {}'.format(gpu['name'], gpu['pci_width']))
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('Usage: gnomehat [start|stop] <experiments_dir>')
+        print('Usage:')
+        print('\tgnomehat start [experiments_dir]')
+        print('\tgnomehat stop')
+        print('\tgnomehat status')
+        print('\tgnomehat <my_experiment.py> --my-options')
         exit(1)
     command = sys.argv[1]
     if command == 'start':
-        if len(sys.argv) < 3:
-            print('Usage: gnomehat start <experiments_dir>')
-            exit(1)
-        experiments_dir = sys.argv[2]
+        check_gpus()
+        if len(sys.argv) == 3:
+            experiments_dir = sys.argv[2]
+        elif os.environ.get('GNOMEHAT_DIR'):
+            experiments_dir = os.environ['GNOMEHAT_DIR']
+        else:
+            print('\n')
+            print('No experiments_dir given and GNOMEHAT_DIR was not exported.')
+            print('Please choose a directory where your experiments should be stored.')
+            print('Enter a directory name (eg. /home/username/experiments)')
+            experiments_dir = input('> ')
+        print('Using experiments_dir: {}'.format(experiments_dir))
         gnomehat_start(experiments_dir)
     elif command == 'stop':
         print('Terminating all gnomehat processes...')
