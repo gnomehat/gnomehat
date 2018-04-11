@@ -185,7 +185,7 @@ def view_experiment(experiment_id):
         for image in sorted(images)[-5:]:
             url = '{}/{}/{}'.format(get_files_url(), experiment_id, image)
             url_latest_n.append(url)
-        
+
         image_groups.append({
             'name': name,
             'url_latest_5': url_latest_n,

@@ -70,6 +70,26 @@ def check_gpus():
         print('\t{} PCI {}'.format(gpu['name'], gpu['pci_width']))
 
 
+def gnomehat_restart_server(experiments_dir):
+    os.system('pkill -f gnomehat_server')
+    run_server(experiments_dir)
+
+
+def get_experiments_dir():
+    if len(sys.argv) == 3:
+        experiments_dir = sys.argv[2]
+    elif os.environ.get('GNOMEHAT_DIR'):
+        experiments_dir = os.environ['GNOMEHAT_DIR']
+    else:
+        print('\n')
+        print('No experiments_dir given and GNOMEHAT_DIR was not exported.')
+        print('Please choose a directory where your experiments should be stored.')
+        print('Enter a directory name (eg. /home/username/experiments)')
+        experiments_dir = input('> ')
+    print('Using experiments_dir: {}'.format(experiments_dir))
+    return experiments_dir
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('Usage:')
@@ -81,17 +101,7 @@ if __name__ == '__main__':
     command = sys.argv[1]
     if command == 'start':
         check_gpus()
-        if len(sys.argv) == 3:
-            experiments_dir = sys.argv[2]
-        elif os.environ.get('GNOMEHAT_DIR'):
-            experiments_dir = os.environ['GNOMEHAT_DIR']
-        else:
-            print('\n')
-            print('No experiments_dir given and GNOMEHAT_DIR was not exported.')
-            print('Please choose a directory where your experiments should be stored.')
-            print('Enter a directory name (eg. /home/username/experiments)')
-            experiments_dir = input('> ')
-        print('Using experiments_dir: {}'.format(experiments_dir))
+        experiments_dir = get_experiments_dir()
         gnomehat_start(experiments_dir)
     elif command == 'stop':
         print('Terminating all gnomehat processes...')
@@ -99,6 +109,9 @@ if __name__ == '__main__':
     elif command == 'status':
         print('The following gnomehat processes are running:')
         os.system('pgrep -a gnomehat')
+    elif command == 'restart-server':
+        experiments_dir = get_experiments_dir()
+        gnomehat_restart_server(experiments_dir)
     else:
         # The command 'gnomehat train.py' is an alias for gnomehat_run
         subprocess.run(['gnomehat_run'] + sys.argv[1:])
