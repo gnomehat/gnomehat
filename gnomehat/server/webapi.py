@@ -15,6 +15,9 @@ import subprocess
 from gnomehat import sysinfo, hostinfo
 from gnomehat.server import app, arg, config
 
+# TODO
+TIMEZONE = 'US/Pacific'
+
 
 def get_files_url():
     return os.path.join(flask.request.url_root, 'experiments')
@@ -54,7 +57,7 @@ def get_results():
         experiment_id = dir_name
         timestamp = int(os.path.getmtime(dir_path))
 
-        started_at = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.timezone('US/Pacific'))
+        started_at = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.timezone(TIMEZONE))
 
         full_path = os.path.join(config['EXPERIMENTS_DIR'], dir_name)
 
@@ -190,7 +193,7 @@ def static_experiments_file(path):
 def timestamp_to_str(timestamp):
     timestamp = int(timestamp)
     value = datetime.datetime.fromtimestamp(timestamp)
-    value.replace(tzinfo=pytz.pst)
+    value.replace(tzinfo=pytz.timezone(TIMEZONE))
     return value.strftime('%Y-%m-%d %H:%M:%S')
 
 
@@ -241,6 +244,7 @@ def view_experiment(experiment_id):
         'last_log': get_log_summary(experiment_id),
         'websocket_host': websocket_host(),
         'websocket_port': port,
+        'files_url': get_files_url(),
     }
     return flask.render_template('experiment.html', **kwargs)
 
