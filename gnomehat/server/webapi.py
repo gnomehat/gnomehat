@@ -84,24 +84,27 @@ def get_results():
 
         is_experiment = 'start.sh' in dir_contents
 
-        experiment_name = experiment_id[:-8].replace('_', ' ').replace('-', ' ')
-        headline = experiment_name.title()
+        experiment_name = experiment_id[:-8]
+        experiment_name = experiment_name.replace('_', ' ').replace('-', ' ').strip()
+        experiment_name = experiment_name.title()
+
+        headline = ""
         if is_experiment:
-            start_path = os.path.join(full_path, 'start.sh')
-            lines = open(start_path).readlines()
-            # TODO: hack; this should come from eg. worker_started
-            command = lines[-1].replace("script -q -c '", '').replace("' /dev/null", "")
-            headline = '{}: {}'.format(experiment_name.title(), command)
+            headline = get_command(full_path)
 
         notes = get_notes(dir_path)
         if notes:
             subtitle = notes
         else:
             subtitle = stdout_last_n_lines(dir_name, n=1)
-            if len(subtitle) > 128:
-                subtitle = subtitle[:128] + '...'
+
+        if len(headline) > 128:
+            headline = headline[:128] + '...'
+        if len(subtitle) > 128:
+            subtitle = subtitle[:128] + '...'
 
         result = {
+            'experiment_name': experiment_name,
             'headline': headline,
             'subtitle': subtitle,
             'dir_name': dir_name,
@@ -125,6 +128,14 @@ def get_notes(dir_path):
     if os.path.exists(notes_filename):
         return open(notes_filename).read()
     return ''
+
+
+# TODO: hack; this should come from eg. worker_started
+def get_command(dir_path):
+    start_path = os.path.join(dir_path, 'start.sh')
+    lines = open(start_path).readlines()
+    command = lines[-1].replace("script -q -c '", '').replace("' /dev/null", "")
+    return command
 
 
 def stdout_last_n_lines(dir_name, n):
