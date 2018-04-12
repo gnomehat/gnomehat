@@ -35,6 +35,7 @@ def front_page():
     start_time = time.time()
     kwargs = {
         'results': get_results(),
+        'files_url': get_files_url(),
     }
     print("Generated results for front page in {:.2f} sec".format(
         time.time() - start_time))
@@ -47,7 +48,7 @@ def get_results():
     result_dirs = [r for r in result_dirs if os.path.isdir(r)]
     result_dirs.sort(key=os.path.getmtime)
     result_dirs = result_dirs[-config['MAX_RESULTS']:]
-    
+
     for dir_path in result_dirs:
         dir_name = dir_path.split('/')[-1]
         experiment_id = dir_name
@@ -150,9 +151,29 @@ def static_file(path):
     return flask.send_from_directory(app.static_folder, path)
 
 
+# HACK: Here I use Flask to serve static files.
+# For a proper service this would be handled by eg. nginx
 @app.route('/experiments/<path:path>')
 def static_experiments_file(path):
-    return flask.send_from_directory(config['EXPERIMENTS_DIR'], path)
+    if '../' in path:
+        print('Error: bad input path {}'.format(path))
+        flask.abort(400)
+    full_path = os.path.join(config['EXPERIMENTS_DIR'], path)
+    if os.path.isdir(full_path):
+        # Serve a directory of filenames
+        listing = []
+        for filename in os.listdir(full_path):
+            stat = os.stat(os.path.join(full_path, filename))
+            listing.append({
+                'name': filename,
+                'size': stat.st_size,
+                'last_modified': stat.st_mtime,
+            })
+        return flask.render_template('listing.html', file_url=get_files_url(),
+                                     listing=listing, cwd=path)
+    else:
+        # Serve an ordinary file
+        return flask.send_from_directory(config['EXPERIMENTS_DIR'], path)
 
 
 @app.route('/delete_job', methods=['POST'])

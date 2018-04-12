@@ -97,12 +97,8 @@ i:hover {
     width: 100%;
     color: #121212;
 }
-.experimentParams {
-    width: 100%;
-    color: #121212;
-}
-.paramlist {
-    width: 100%;
+.subtitle {
+  font-size: 12pt;
 }
   </style>
   <script>
@@ -144,7 +140,7 @@ function setResultText(text) {
     <div class="row" id="header">
       <center>
         <img src="/static/images/default.png"></img>
-        <span style="font-size: 30pt">GnomeHat Experiments</span>
+        <span style="font-size: 30pt">Experiments</span>
         <img src="/static/images/default.png" style="transform: scaleX(-1);"></img>
       </center>
     </div>
@@ -152,7 +148,6 @@ function setResultText(text) {
       <div class="column" id="resultsList">
         <span id="resultDisplayCount"></span>
         {{ results | length }} recent results. &nbsp
-        <a href="http://files.deeplearninggroup.com">View Older Results</a>
         <br>
         <input class="search" type="text" id="resultSearchInput" onkeyup="filterResults()" placeholder="Search for results..">
         <br>
@@ -160,7 +155,7 @@ function setResultText(text) {
         <div class="gradient {{result['color']}}">
           <div class="content" style="float: left">
             <div>
-            <a href="http://files.deeplearninggroup.com/{{ result['dir_name'] }}">
+            <a href="{{ files_url }}/{{ result['dir_name'] }}">
               {% if result['finished']: %}
               <i class="fa fa-cloud-download" aria-hidden="true"></i>
               {% else %}
@@ -175,7 +170,7 @@ function setResultText(text) {
               <span class=big style="position: absolute;" >
                 {{ result['headline'] }}
                 <br>
-                {{ result['subtitle'] }}
+                <pre class="subtitle">{{ result['subtitle'] }}</pre>
               </span>
             </a>
           </div>
@@ -185,8 +180,8 @@ function setResultText(text) {
           <br>
         </div>
           {% if result['last_log_summary'] and result['color'] == 'orangeish': %}
-          <br>
-          <pre>{{ result['last_log_summary'] }}</pre>
+          <!-- TODO: Add a mini log console under the row -->
+          <!-- <pre>{{ result['last_log_summary'] }}</pre> -->
           {%endif %}
         {% endfor %}
       </div>
@@ -197,7 +192,6 @@ function setResultText(text) {
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 </body>
 <script>
-var experimentParams = document.getElementsByClassName("experimentParams");
 
 function toggleDisplay(elementId) {
     var element = document.getElementById(elementId);

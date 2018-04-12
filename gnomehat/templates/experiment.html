@@ -29,6 +29,7 @@ body {
 #repl {
   width: 100%;
   background-color: #0a0a0a;
+  margin-bottom: 20px;
 }
 
 .slider {
@@ -54,6 +55,9 @@ body {
   </style>
 </head>
 <body>
+    <div class="row">
+      <a href="/">Go Back</a>
+    </div>
   <div class="container">
 
     <h1>Experiment {{experiment_id}}</h1>
@@ -61,8 +65,13 @@ body {
     <h4>Console</h4>
     <div id="repl" width=1024px></div>
 
-    <h4>Visualizations</h4>
+    <h4>Output Image Files</h4>
+
+    {% if image_groups.length == 0: %}
+    No images output.
+    {% else %}
     Found {{ image_groups | length }} image groups.
+    {% endif %}
 
     {% for visualization in image_groups: %}
     <div class="row">
@@ -71,6 +80,7 @@ body {
         {% for image_url in visualization['url_latest_5'] %}
             <div>
                 <a href={{image_url}}>{{image_url}}</a>
+                <br>
                 <img style="max-width:100%" src="{{ image_url }}"></img>
             </div>
         {% endfor %}
