@@ -178,13 +178,20 @@ def static_experiments_file(path):
             listing.append({
                 'name': filename,
                 'size': stat.st_size,
-                'last_modified': stat.st_mtime,
+                'last_modified': timestamp_to_str(stat.st_mtime),
             })
-        return flask.render_template('listing.html', file_url=get_files_url(),
+        return flask.render_template('listing.html',
+                                     files_url=get_files_url(),
                                      listing=listing, cwd=path)
     else:
         # Serve an ordinary file
         return flask.send_from_directory(config['EXPERIMENTS_DIR'], path)
+
+def timestamp_to_str(timestamp):
+    timestamp = int(timestamp)
+    value = datetime.datetime.fromtimestamp(timestamp)
+    value.replace(tzinfo=pytz.pst)
+    return value.strftime('%Y-%m-%d %H:%M:%S')
 
 
 @app.route('/delete_job', methods=['POST'])
