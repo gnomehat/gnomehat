@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import flask
 import json
-import rq
 import sys
 from gnomehat import server
 from gnomehat import hostinfo

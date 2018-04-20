@@ -7,7 +7,6 @@ import pickle
 import flask
 import json
 import os
-import rq
 import sys
 import pytz
 import subprocess
