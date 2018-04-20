@@ -12,7 +12,18 @@ setup(name='gnomehat',
             'gnomehat/server'
         ],
         package_data={
-            'gnomehat': ['templates/*', 'static/*', 'static/*/*']
+            'gnomehat': ['templates/*',
+                         'static/*.js',
+                         'static/fonts/*.otf',
+                         'static/fonts/*.svg',
+                         'static/fonts/*.woff',
+                         'static/fonts/*.woff2',
+                         'static/fonts/*.ttf',
+                         'static/fonts/*.otf',
+                         'static/fonts/*.eot',
+                         'static/css/.css',
+                         'static/images/*.png',
+                         ]
         },
         scripts=['scripts/gnomehat_server',
                  'scripts/gnomehat_worker',
