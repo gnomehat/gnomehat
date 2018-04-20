@@ -33,5 +33,6 @@ setup(name='gnomehat',
       install_requires=[
           "requests",
           "flask",
+          "pytz",
       ],
 )
