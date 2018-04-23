@@ -67,7 +67,7 @@ def check_gpus():
     print('GnomeHat initializing...')
     print('Found {} GPUs:'.format(len(gpus)))
     for gpu in gpus:
-        print('\t{} PCI {}'.format(gpu['name'], gpu['pci_width']))
+        print('\t{}'.format(gpu['name']))
 
 
 def gnomehat_restart_server(experiments_dir):

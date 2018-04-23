@@ -74,19 +74,13 @@ def get_mb_info():
 
 
 def get_gpu_info():
-    nv_lines = run('sudo lspci -vv | grep -A 57 "VGA compatible controller: NVIDIA" | egrep -o "(VGA.*Device ....|LnkSta:.*Width.*,)" | paste - - -d\;')
+    nv_lines = run('lspci -vv | grep "VGA compatible controller: NVIDIA"')
     gpu_info = []
     for line in nv_lines.splitlines():
-        if ';' in line:
-            device_id, pci_info = line.split(';')
-            device_id = device_id.split(' ')[-1]
-            speed = pci_info.split(',')[0].split()[-1]
-            width = pci_info.split(',')[1].split()[-1]
-            gpu_info.append({
-                'device_id': device_id,
-                'pci_speed': speed,
-                'pci_width': width,
-                'name': nv_id_to_name(device_id)})
+        device_id = line.split()[7]
+        gpu_info.append({
+            'device_id': device_id,
+            'name': nv_id_to_name(device_id)})
     return gpu_info
 
 
