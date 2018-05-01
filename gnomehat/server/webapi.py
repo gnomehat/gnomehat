@@ -182,9 +182,10 @@ def static_experiments_file(path):
                 'size': stat.st_size,
                 'last_modified': timestamp_to_str(stat.st_mtime),
             })
+        listing.sort(key=lambda x: x['name'])
         return flask.render_template('listing.html',
                                      files_url=get_files_url(),
-                                     listing=listing, cwd=path)
+                                     listing=listing, cwd=full_path)
     else:
         # Serve an ordinary file
         return flask.send_from_directory(config['EXPERIMENTS_DIR'], path)
