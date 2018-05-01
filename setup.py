@@ -21,7 +21,7 @@ setup(name='gnomehat',
                          'static/fonts/*.ttf',
                          'static/fonts/*.otf',
                          'static/fonts/*.eot',
-                         'static/css/.css',
+                         'static/css/*.css',
                          'static/images/*.png',
                          ]
         },
