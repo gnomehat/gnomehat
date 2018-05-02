@@ -1,5 +1,7 @@
 # GnomeHat
 
+![GnomeHat UI Screenshot](https://raw.githubusercontent.com/lwneal/gnomehat/master/screenshot.jpg)
+
 The easy experiment runner.
 Install it with pip:
 ```bash
