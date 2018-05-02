@@ -1,18 +1,20 @@
 # GnomeHat
 
+A free and open source tool for automatic experiment version control.
+GnomeHat makes your experiments organized and reproducible, so you can focus on the science!
+
 ![GnomeHat UI Screenshot](https://raw.githubusercontent.com/lwneal/gnomehat/master/screenshot.jpg)
 
-The easy experiment runner.
 Install it with pip:
 ```bash
-pip install git+https://github.com/lwneal/gnomehat 
-gnomehat start 
+pip install git+https://github.com/lwneal/gnomehat
+gnomehat start
 
 GnomeHat UI is now running at:
     http://localhost:8086/
 ```
 
-Then run any PyTorch, Tensorflow, or other Python command that requires a GPU:
+Then run any PyTorch, Tensorflow, or other Python command:
 
 ```bash
 cd my-cool-experiment
