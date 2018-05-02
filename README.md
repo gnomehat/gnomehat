@@ -44,7 +44,7 @@ If you start more experiments than that, the extra experiments will remain enque
 
 ## Requirements
 
-GnomeHat requires `websocketd`.
+GnomeHat requires [websocketd](https://github.com/joewalnes/websocketd).
 GnomeHat runs on Ubuntu 16.04 or higher and requires CUDA 8 or higher.
 You should be able to run the commands `nvidia-smi` and `nvcc` without errors.
 
