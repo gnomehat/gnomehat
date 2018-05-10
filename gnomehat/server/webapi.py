@@ -185,7 +185,7 @@ def static_experiments_file(path):
         listing.sort(key=lambda x: x['name'])
         return flask.render_template('listing.html',
                                      files_url=get_files_url(),
-                                     listing=listing, cwd=full_path)
+                                     listing=listing, cwd=path)
     else:
         # Serve an ordinary file
         return flask.send_from_directory(config['EXPERIMENTS_DIR'], path)
