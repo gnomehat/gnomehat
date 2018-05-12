@@ -31,75 +31,107 @@ body {
   margin-bottom: 20px;
 }
 
-.slider {
-  overflow-x: scroll;
+.tablink {
+  background-color: #555;
+  color: white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 17px;
+  width: 200px;
+  height: 64px;
 }
-.holder {
-  width: 500%;
+
+.tablink:hover {
+  background-color: #777;
 }
-.slide {
-  float: left;
-  height: 256px;
-  position: relative;
-  background-position: -100px 0;
+
+.tabcontent {
+    float: none;
 }
-.slide:before {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 40%;
-}
+
   </style>
 </head>
 <body>
-    <div class="row">
-      <a href="/">Go Back</a>
-    </div>
+  <div class="row">
+    <a href="/" style="float:left; font-size:24px;">Go Back</a>
+    <center>
+      <h3>Experiment {{experiment_id}}</h3>
+    </center>
+  </div>
+
   <div class="container">
+    <p style="margin-bottom:10px;">
+      <button class="tablink" onclick="openTab('console')" id="defaultOpen">Console</button>
+      <button class="tablink" onclick="openTab('files')">Files</button>
+      <button class="tablink" onclick="openTab('visualizations')">Visualizations</button>
+      <button class="tablink" onclick="openTab('tensorboard');loadTensorboard();">Tensorboard</button>
+    </p>
 
-    <h1>Experiment {{experiment_id}}</h1>
+    <div id="console" class="tabcontent">
+        <div id="repl" width=1024px></div>
+    </div>
 
-    <h4>Tensorboard</h4>
-    <a href="http://{{tensorboard_host}}:{{tensorboard_port}}">Tensorboard Link</a>
+    <div id="files" class="tabcontent">
+      <div class="row" style="background-color: white;">
+        <iframe width=100% height=2048px src="{{files_url}}/{{experiment_id}}"></iframe>
+      </div>
+    </div>
 
-    <h4>Console</h4>
-    <div id="repl" width=1024px></div>
+    <div id="visualizations" class="tabcontent">
+        <h4>Output Image Files</h4>
 
-    <h4>Output Image Files</h4>
+        {% if image_groups.length == 0: %}
+        No images output.
+        {% else %}
+        Found {{ image_groups | length }} image groups.
+        {% endif %}
 
-    {% if image_groups.length == 0: %}
-    No images output.
-    {% else %}
-    Found {{ image_groups | length }} image groups.
-    {% endif %}
+        {% for visualization in image_groups: %}
+        <div class="row">
+            <h3>{{ visualization['name'] }}</h3>
 
-    {% for visualization in image_groups: %}
-    <div class="row">
-        <h3>{{ visualization['name'] }}</h3>
-
-        {% for image_url in visualization['url_latest_5'] %}
-            <div>
-                <a href={{image_url}}>{{image_url}}</a>
-                <br>
-                <img style="max-width:100%" src="{{ image_url }}"></img>
-            </div>
+            {% for image_url in visualization['url_latest_5'] %}
+                <div>
+                    <a href={{image_url}}>{{image_url}}</a>
+                    <br>
+                    <img style="max-width:100%" src="{{ image_url }}"></img>
+                </div>
+            {% endfor %}
+        </div>
         {% endfor %}
     </div>
-    {% endfor %}
 
-  <h3>File Listing</h3>
-  <div class="row" style="background-color: white;">
-    <iframe width=100% height=640px src="{{files_url}}/{{experiment_id}}"></iframe>
+    <div id="tensorboard" class="tabcontent">
+        <iframe id="tensorboard_iframe" width=100% height=1024px></iframe>
+    </div>
+
   </div>
-  </div>
-
-
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 </body>
 <script>
+function openTab(pageName) {
+    var i, tabcontent, tablinks;
+    var visible_tab = document.getElementById(pageName);
+
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        if (tabcontent[i] == visible_tab) {
+            tabcontent[i].style.display = "block";
+        } else {
+            tabcontent[i].style.display = "none";
+        }
+    }
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+
+function loadTensorboard() {
+    var tensorboard_url = "http://{{tensorboard_host}}:{{tensorboard_port}}";
+    document.getElementById("tensorboard_iframe").src = tensorboard_url;
+}
+
 function toggleDisplay(elementId) {
     var element = document.getElementById(elementId);
     if (element.style.display === 'none') {
