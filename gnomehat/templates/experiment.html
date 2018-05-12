@@ -22,8 +22,8 @@
 
   <style>
 body {
-  color: #eeeeee;
-  background-color: #272727;
+  color: #111111;
+  background-color: #eeeeee;
 }
 #repl {
   width: 100%;
@@ -60,7 +60,6 @@ body {
       <h3>Experiment {{experiment_id}}</h3>
     </center>
   </div>
-
   <div class="container">
     <p style="margin-bottom:10px;">
       <button class="tablink" onclick="openTab('console')" id="defaultOpen">Console</button>
@@ -74,9 +73,7 @@ body {
     </div>
 
     <div id="files" class="tabcontent">
-      <div class="row" style="background-color: white;">
-        <iframe width=100% height=2048px src="{{files_url}}/{{experiment_id}}"></iframe>
-      </div>
+        <iframe frameBorder="0" width=100% height=2048px src="{{files_url}}/{{experiment_id}}"></iframe>
     </div>
 
     <div id="visualizations" class="tabcontent">
@@ -106,7 +103,6 @@ body {
     <div id="tensorboard" class="tabcontent">
         <iframe id="tensorboard_iframe" width=100% height=1024px></iframe>
     </div>
-
   </div>
 </body>
 <script>
