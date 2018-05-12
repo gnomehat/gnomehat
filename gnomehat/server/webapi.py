@@ -14,7 +14,7 @@ import subprocess
 from gnomehat import sysinfo, hostinfo
 from gnomehat.server import app, arg, config
 
-# TODO
+# TODO: Rest of world
 TIMEZONE = 'US/Pacific'
 
 
@@ -27,6 +27,12 @@ def default_image_url():
 
 
 def websocket_host():
+    host = flask.request.url_root.replace('http://', '').rstrip('/')
+    host = host.split(':')[0]
+    return host
+
+
+def tensorboard_host():
     host = flask.request.url_root.replace('http://', '').rstrip('/')
     host = host.split(':')[0]
     return host
@@ -236,15 +242,20 @@ def view_experiment(experiment_id):
     image_groups.sort(key=lambda x: x['name'])
 
     # When this page is viewed, spawn a websocketd
-    port = spawn_console_websocket(os.path.join(dir_path, 'stdout.txt'))
+    console_port = spawn_console_websocket(os.path.join(dir_path, 'stdout.txt'))
+
+    # When this page is viewed, spawn a Tensorboard server (if applicable)
+    tensorboard_port = spawn_tensorboard(os.path.join(dir_path, 'runs'))
 
     kwargs = {
         'experiment_id': experiment_id,
         'image_groups': image_groups,
         'last_log': get_log_summary(experiment_id),
         'websocket_host': websocket_host(),
-        'websocket_port': port,
+        'websocket_port': console_port,
         'files_url': get_files_url(),
+        'tensorboard_host': tensorboard_host(),
+        'tensorboard_port': tensorboard_port,
     }
     return flask.render_template('experiment.html', **kwargs)
 
@@ -256,9 +267,22 @@ def spawn_console_websocket(filename):
     # TODO: something much much more sophisticated
     os.system('pkill -f websocketd')
 
-    portnum = random.randint(20000, 29999)
+    portnum = random.randint(20000, 20999)
     # TODO proper input sanitizing and process pool and resource management and and ...
     cmd = 'websocketd --port {:d} stdbuf -i0 -o0 -e0 tail -n 100 -f {} &'.format(portnum, filename)
+    print("Running {}".format(cmd))
+    os.system(cmd)
+    return portnum
+
+
+def spawn_tensorboard(logdir):
+    # Clean up any previous unused sockets for this experiment
+    # TODO: something much much more sophisticated
+    os.system('pkill -f tensorboard')
+
+    portnum = random.randint(21000, 21999)
+    # TODO proper input sanitizing and process pool and resource management and and ...
+    cmd = 'tensorboard --logdir {} --port {} & >/dev/null'.format(logdir, portnum)
     print("Running {}".format(cmd))
     os.system(cmd)
     return portnum

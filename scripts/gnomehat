@@ -59,7 +59,8 @@ def run_server(experiments_dir):
 
 def gnomehat_stop():
     # TODO: Send a special signal maybe?
-    os.system('pkill -f gnomehat')
+    os.system('pkill -f gnomehat_server')
+    os.system('pkill -f gnomehat_worker')
     # TODO: Mark jobs as cancelled so they don't stay eternally 'still running'
 
 
@@ -135,6 +136,11 @@ if __name__ == '__main__':
     elif command == 'stop':
         print('Terminating all gnomehat processes...')
         gnomehat_stop()
+    elif command == 'restart':
+        print('Restarting...')
+        experiments_dir = get_experiments_dir()
+        gnomehat_stop()
+        gnomehat_start(experiments_dir)
     elif command == 'status':
         print('The following gnomehat processes are running:')
         os.system('pgrep -a gnomehat')
