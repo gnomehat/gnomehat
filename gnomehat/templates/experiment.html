@@ -32,15 +32,14 @@ body {
 }
 
 .tablink {
-  background-color: #555;
-  color: white;
-  border: none;
+  color: blue;
+  border: 1;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
+  padding: 7px 16px;
   font-size: 17px;
   width: 200px;
-  height: 64px;
+  height: 50px;
 }
 
 .tablink:hover {
@@ -50,22 +49,25 @@ body {
 .tabcontent {
     float: none;
 }
-
+iframe {
+    width: 100%;
+    height: 2048px;
+}
   </style>
 </head>
 <body>
   <div class="row">
     <a href="/" style="float:left; font-size:24px;">Go Back</a>
     <center>
-      <h3>Experiment {{experiment_id}}</h3>
+      <h4>Experiment {{experiment_id}}</h4>
     </center>
   </div>
   <div class="container">
-    <p style="margin-bottom:10px;">
+    <p style="margin-bottom:3px;">
       <button class="tablink" onclick="openTab('console')" id="defaultOpen">Console</button>
       <button class="tablink" onclick="openTab('files')">Files</button>
       <button class="tablink" onclick="openTab('visualizations')">Visualizations</button>
-      <button class="tablink" onclick="openTab('tensorboard');loadTensorboard();">Tensorboard</button>
+      <a id="tensorboard_link"><button class="tablink">Tensorboard</button></a>
     </p>
 
     <div id="console" class="tabcontent">
@@ -73,7 +75,7 @@ body {
     </div>
 
     <div id="files" class="tabcontent">
-        <iframe frameBorder="0" width=100% height=2048px src="{{files_url}}/{{experiment_id}}"></iframe>
+        <iframe frameBorder="0" src="{{files_url}}/{{experiment_id}}"></iframe>
     </div>
 
     <div id="visualizations" class="tabcontent">
@@ -101,7 +103,7 @@ body {
     </div>
 
     <div id="tensorboard" class="tabcontent">
-        <iframe id="tensorboard_iframe" width=100% height=1024px></iframe>
+        <iframe frameBorder="0" position: relative; width: 100vw; id="tensorboard_iframe"></iframe>
     </div>
   </div>
 </body>
@@ -123,10 +125,8 @@ function openTab(pageName) {
 // Get the element with id="defaultOpen" and click on it
 document.getElementById("defaultOpen").click();
 
-function loadTensorboard() {
-    var tensorboard_url = "http://{{tensorboard_host}}:{{tensorboard_port}}";
-    document.getElementById("tensorboard_iframe").src = tensorboard_url;
-}
+var tensorboard_url = "http://{{tensorboard_host}}:{{tensorboard_port}}";
+document.getElementById("tensorboard_link").href = tensorboard_url;
 
 function toggleDisplay(elementId) {
     var element = document.getElementById(elementId);
