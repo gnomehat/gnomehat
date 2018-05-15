@@ -1,7 +1,11 @@
 # GnomeHat
 
 A free and open source tool for automatic experiment version control.
-GnomeHat makes your experiments organized and reproducible, so you can focus on the science!
+
+Deep network training and other data science jobs take a long time, and when you run a lot of them it's easy to lose track of which version of your code produced which results.
+Gnomehat stores your results and a git repository snapshot every time you run your code, so you can search all your old results and see exactly what code produced them.
+
+Gnomehat makes your experiments organized and reproducible, so you can focus on doing data science!
 
 ![GnomeHat UI Screenshot](https://raw.githubusercontent.com/lwneal/gnomehat/master/screenshot.jpg)
 
@@ -69,7 +73,7 @@ Do you have trouble organizing your experimental results?
 Do you forget which figure came from which neural network, or which version of your code produced a particular result?
 Or do you just want an easy way to run your experiment many times on separate GPUs?
 
-GnomeHat makes experiment versioning easy, so that you can focus on the science.
+GnomeHat makes experiment versioning easy.
 
 
 ### Before
