@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='gnomehat',
-        version='0.2.5',
+        version='0.3.0',
         description='GnomeHat makes it easy to run experiments.',
         author='Larry Neal',
         author_email='nealla@lwneal.com',
@@ -34,5 +34,7 @@ setup(name='gnomehat',
           "requests",
           "flask",
           "pytz",
+          "tqdm",
+          "tensorboard_logger",
       ],
 )

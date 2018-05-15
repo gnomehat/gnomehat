@@ -3,8 +3,9 @@ scipy
 Pillow
 Flask
 nose
-rq
 pytest
 pytz
 docopt
 requests
+tqdm
+tensorboard_logger
