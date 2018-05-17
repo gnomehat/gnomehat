@@ -5,6 +5,7 @@ import numpy as np
 import time
 import datetime
 import pytz
+import json
 from tqdm import tqdm
 import tensorboard_logger
 
@@ -130,6 +131,8 @@ class TimeSeries:
         text = '\n'.join(lines)
         # Cache the most recent printed text to a file
         open('.last_summary.log', 'w').write(text)
+        last_values = {key: self.series[key][-1] for key in self.series}
+        open('.last_summary.json', 'w').write(json.dumps(last_values, indent=2))
         return text
 
     def write_to_file(self):
