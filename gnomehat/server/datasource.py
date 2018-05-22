@@ -19,7 +19,7 @@ from gnomehat.server import app, config
 TIMEZONE = 'US/Pacific'
 
 
-def get_results():
+def get_results(files_url):
     results = []
     result_dirs = [os.path.join(config['EXPERIMENTS_DIR'], r) for r in os.listdir(config['EXPERIMENTS_DIR'])]
     result_dirs = [r for r in result_dirs if os.path.isdir(r)]
@@ -45,7 +45,7 @@ def get_results():
                 return os.path.getmtime(os.path.join(full_path,x))
             jpgs.sort(key=last_modified)
             last_modified_timestamp = last_modified(jpgs[-1])
-            image_url = '{}/{}/{}'.format(get_files_url(), dir_name, jpgs[-1])
+            image_url = '{}/{}/{}'.format(files_url, dir_name, jpgs[-1])
 
         running_job = os.path.exists(os.path.join(full_path, 'worker_lockfile'))
         finished_job = os.path.exists(os.path.join(full_path, 'worker_finished'))
@@ -172,3 +172,7 @@ def get_dir_contents(dir_name):
 def get_dir_images(dir_name):
     files = get_dir_contents(dir_name)
     return [f for f in files if has_image_extension(f)]
+
+def default_image_url():
+    return os.path.join(flask.request.url_root, '/static/images/default.png')
+

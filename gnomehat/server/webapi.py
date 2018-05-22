@@ -27,7 +27,7 @@ TIMEZONE = 'US/Pacific'
 def front_page():
     start_time = time.time()
     kwargs = {
-        'results': get_results(),
+        'results': get_results(get_files_url()),
         'files_url': get_files_url(),
     }
     print("Generated results for front page in {:.2f} sec".format(
@@ -153,9 +153,6 @@ def spawn_tensorboard(logdir):
 def get_files_url():
     return os.path.join(flask.request.url_root, 'experiments')
 
-
-def default_image_url():
-    return os.path.join(flask.request.url_root, '/static/images/default.png')
 
 
 def websocket_host():
