@@ -81,16 +81,11 @@ def show(
         pixels = data
     elif type(data) == Image.Image:
         pixels = np.array(data)
-    elif type(data).__name__ == 'FloatTensor':
+    elif type(data).__name__ in ['FloatTensor', 'Tensor', 'Variable']:
         # Pytorch tensor
+        if data.requires_grad:
+            data = data.detach()
         pixels = data.cpu().numpy()
-        if len(pixels.shape) == 4:
-            pixels = pixels.transpose((0,2,3,1))
-        elif len(pixels.shape) == 3 and pixels.shape[0] in (1, 3):
-            pixels = pixels.transpose((1,2,0))
-    elif type(data).__name__ == 'Variable':
-        # Pytorch tensor container
-        pixels = data.data.cpu().numpy()
         if len(pixels.shape) == 4:
             pixels = pixels.transpose((0,2,3,1))
         elif len(pixels.shape) == 3 and pixels.shape[0] in (1, 3):
@@ -104,6 +99,7 @@ def show(
     elif hasattr(data, 'startswith'):
         pixels = decode_jpg(data, resize_to=resize_to)
     else:
+        print('imutil.show() handling unknown type {}'.format(type(data)))
         pixels = np.array(data)
 
     # Split non-RGB images into sets of monochrome images
