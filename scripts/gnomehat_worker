@@ -67,8 +67,8 @@ def run_experiments(experiments_dir):
         if not os.path.isdir(dirname):
             continue
         files = os.listdir(dirname)
-        # Look for one that has a ./start.sh
-        if not 'start.sh' in files:
+        # Look for one that has a ./gnomehat_start.sh
+        if not 'gnomehat_start.sh' in files:
             continue
         # And does not have a worker_lockfile
         if 'worker_lockfile' in files:

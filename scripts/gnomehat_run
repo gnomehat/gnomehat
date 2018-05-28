@@ -113,15 +113,12 @@ if __name__ == '__main__':
     target_dir = make_target_dir(experiments_dir, experiment_name)
     copy_repo(target_dir)
 
-    # In target_dir ./start.sh if it does not exist
+    # Write a .sh script containing the user-supplied command to be run
     os.chdir(target_dir)
-    if os.path.exists('./start.sh'):
-        print('Using ./start.sh to run experiment')
-    else:
-        print('Creating {}/start.sh'.format(target_dir))
-        with open('start.sh', 'w') as fp:
-            fp.write(build_start_sh(options))
-        chmodx('start.sh')
+    print('Creating {}/gnomehat_start.sh'.format(target_dir))
+    with open('gnomehat_start.sh', 'w') as fp:
+        fp.write(build_start_sh(options))
+    chmodx('gnomehat_start.sh')
 
     with open('gnomehat_notes.txt', 'w') as fp:
         fp.write(options['notes'])

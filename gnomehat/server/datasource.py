@@ -59,7 +59,7 @@ def get_results(files_url):
         elif not started_job and not running_job:
             color = 'greenish'
 
-        is_experiment = 'start.sh' in dir_contents
+        is_experiment = 'gnomehat_start.sh' in dir_contents
 
         experiment_name = experiment_id[:-8]
         experiment_name = experiment_name.replace('_', ' ').replace('-', ' ').strip()
@@ -74,6 +74,11 @@ def get_results(files_url):
             subtitle = notes
         else:
             subtitle = stdout_last_n_lines(dir_name, n=1)
+
+        metrics_summary = {}
+        metrics_summary_filename = os.path.join(dir_path, '.last_summary.json')
+        if os.path.exists(metrics_summary_filename):
+            metrics_summary = json.loads(open(metrics_summary_filename).read())
 
         if len(headline) > 128:
             headline = headline[:128] + '...'
@@ -94,6 +99,7 @@ def get_results(files_url):
             'image_url': image_url,
             'last_log_summary': get_log_summary(dir_name),
             'is_experiment': is_experiment,
+            'metrics_summary': metrics_summary,
         }
 
         results.append(result)
@@ -109,7 +115,7 @@ def get_notes(dir_path):
 
 # TODO: hack; this should come from eg. worker_started
 def get_command(dir_path):
-    start_path = os.path.join(dir_path, 'start.sh')
+    start_path = os.path.join(dir_path, 'gnomehat_start.sh')
     lines = open(start_path).readlines()
     command = lines[-1].replace("script -q -c '", '').replace("' /dev/null", "")
     return command
