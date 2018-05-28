@@ -63,8 +63,13 @@ def static_experiments_file(path):
                                      files_url=get_files_url(),
                                      listing=listing, cwd=path)
     else:
-        # Serve an ordinary file
-        return flask.send_from_directory(config['EXPERIMENTS_DIR'], path)
+        # Serve an ordinary file, defaulting to text
+        TEXT_EXTENSIONS = ['txt', 'py', 'json', 'sh', 'c', 'gitignore', 'log']
+        mimetype = None
+        if path.lower().split('.')[-1] not in TEXT_EXTENSIONS:
+            mimetype = 'text/plain'
+        return flask.send_from_directory(config['EXPERIMENTS_DIR'], path,
+                                         mimetype=mimetype)
 
 
 @app.route('/delete_job', methods=['POST'])
