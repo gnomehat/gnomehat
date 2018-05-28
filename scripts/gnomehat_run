@@ -122,8 +122,9 @@ if __name__ == '__main__':
         with open('start.sh', 'w') as fp:
             fp.write(build_start_sh(options))
         chmodx('start.sh')
-        with open('gnomehat_notes.txt', 'w') as fp:
-            fp.write(options['notes'])
+
+    with open('gnomehat_notes.txt', 'w') as fp:
+        fp.write(options['notes'])
 
     gui_url = hostinfo.get_hostinfo(experiments_dir).get('gui_url')
     if gui_url:
