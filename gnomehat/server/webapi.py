@@ -35,6 +35,18 @@ def front_page():
     return flask.render_template('index.html', **kwargs)
 
 
+@app.route('/compare')
+def compare_experiments():
+    start_time = time.time()
+    kwargs = {
+        'results': get_results(get_files_url()),
+        'files_url': get_files_url(),
+    }
+    print("Generated results for front page in {:.2f} sec".format(
+        time.time() - start_time))
+    return flask.render_template('comparison.html', **kwargs)
+
+
 @app.route('/static/<path:path>')
 def static_file(path):
     return flask.send_from_directory(app.static_folder, path)
