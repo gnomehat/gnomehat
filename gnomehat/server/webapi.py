@@ -78,7 +78,7 @@ def static_experiments_file(path):
         # Serve an ordinary file, defaulting to text
         TEXT_EXTENSIONS = ['txt', 'py', 'json', 'sh', 'c', 'gitignore', 'log']
         mimetype = None
-        if path.lower().split('.')[-1] not in TEXT_EXTENSIONS:
+        if path.lower().split('.')[-1] in TEXT_EXTENSIONS:
             mimetype = 'text/plain'
         return flask.send_from_directory(config['EXPERIMENTS_DIR'], path,
                                          mimetype=mimetype)
