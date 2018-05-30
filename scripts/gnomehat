@@ -112,8 +112,8 @@ def get_experiments_dir():
         # TODO: readline
         experiments_dir = input('> ')
         print('\n')
-        print('Now using {} as the GNOMEHAT_DIR')
-        print('Saving {} to ~/.gnomehat')
+        print('Now using {} as the GNOMEHAT_DIR'.format(experiments_dir))
+        print('Saving {} to ~/.gnomehat'.format(experiments_dir))
         save_config_file({'experiments_dir': experiments_dir})
     print('Using experiments_dir: {}'.format(experiments_dir))
     os.makedirs(experiments_dir, exist_ok=True)
