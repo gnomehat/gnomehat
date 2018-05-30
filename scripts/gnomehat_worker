@@ -107,7 +107,7 @@ def run_experiment(dirname):
             log('Writing to the logfile...')
             log_fp.write('[Worker starting experiment at {}]\n'.format(timestamp))
             log('calling subprocess.Popen')
-            proc = subprocess.Popen('./start.sh',
+            proc = subprocess.Popen('./gnomehat_start.sh',
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT,
                                     bufsize=1,
