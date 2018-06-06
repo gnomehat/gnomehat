@@ -228,12 +228,10 @@ class VideoMaker(object):
     def write_frame(self,
                     frame,
                     font_size=12,
-                    resize_to=(512,512),
                     **kwargs):
         show(frame,
             video_filename=self.filename,
             font_size=font_size,
-            resize_to=resize_to,
             display=False,
             **kwargs)
 
