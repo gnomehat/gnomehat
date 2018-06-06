@@ -132,12 +132,16 @@ def show(
 
     # Draw text into the image
     if caption is not None:
+        pixels = pixels.squeeze()
         img = Image.fromarray(pixels.astype('uint8'))
         font = ImageFont.truetype(FONT_FILE, font_size)
         draw = ImageDraw.Draw(img)
         textsize = draw.textsize(caption, font=font)
-        draw.rectangle([(0, 0), textsize], fill=(0,0,0,128))
-        draw.multiline_text((0,0), caption, font=font, fill=(255,255,255))
+        # TODO: issues with fill
+        #draw.rectangle([(0, 0), textsize], fill=(0,0,0,128))
+        draw.rectangle([(0, 0), textsize])
+        #draw.multiline_text((0,0), caption, font=font, fill=(255,255,255))
+        draw.multiline_text((0,0), caption, font=font)
         pixels = np.array(img)
 
     # Set a default filename if one does not exist
