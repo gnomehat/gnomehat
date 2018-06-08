@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>GnomeHat</title>
+  <meta name="description" content="GnomeHat Main Page">
+  <meta name="author" content="GnomeHat">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="static/css/normalize.css">
+  <link rel="stylesheet" href="static/css/skeleton.css">
+
+  <link rel="icon" type="image/png" href="static/images/favicon.png">
+
+  <style>
+body {
+  color: #111111;
+  background-color: #f0f0f0;
+}
+.title {
+  font-size: 24pt;
+}
+.header span {
+  font-size: 24pt;
+  padding: 5px;
+}
+.content {
+  padding: 12px;
+}
+.search {
+    width: 100%;
+    color: #121212;
+}
+  </style>
+  <script>
+function filterResults() {
+    var input = document.getElementById("resultSearchInput");
+    var filter = input.value.toUpperCase();
+    var resultsList = document.getElementById("resultsList");
+    var results = resultsList.getElementsByClassName("gradient");
+
+    var visibleCount = 0;
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < results.length; i++) {
+        div = results[i];
+        if (div.innerHTML.toUpperCase().indexOf(filter) > -1) {
+            div.style.display = "block";
+            visibleCount++;
+        } else {
+            div.style.display = "none";
+        }
+    }
+    if (visibleCount < results.length) {
+        setResultText('Displaying ' + visibleCount + ' of ');
+    } else {
+        setResultText('');
+    }
+}
+
+function setResultText(text) {
+    var resultText = document.getElementById("resultDisplayCount");
+    resultText.innerHTML = text;
+}
+
+  </script>
+
+</head>
+<body>
+  <center>
+    <span class="title">Experiment Results</span>
+  </center>
+  <div class="container">
+    <br>
+    <div class="row" id="results">
+      <div class="column" id="resultsList">
+        <span id="resultDisplayCount"></span>
+        {{ metrics | length }} recent results.
+        <br>
+        <input class="search" type="text" id="resultSearchInput" onkeyup="filterResults()" placeholder="Search for results..">
+        <br>
+        <table>
+        <tr>
+          <th>
+            Experiment
+          </th>
+          {% for key in keys %}
+          <th>
+              {{key}}
+          </th>
+          {% endfor %}
+        </tr>
+
+        {% for experiment_id in metrics: %}
+        <tr>
+          <td>
+              <a href="/experiment/{{experiment_id}}">{{experiment_id}}</a>
+          </td>
+          {% for key in keys: %}
+            <td>{{metrics[experiment_id].get(key, 'N/A')}}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+        </table>
+
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+
+function toggleDisplay(elementId) {
+    var element = document.getElementById(elementId);
+    if (element.style.display === 'none') {
+        element.style.display = 'block';
+    } else {
+        element.style.display = 'none';
+    }
+}
+</script>
+</html>

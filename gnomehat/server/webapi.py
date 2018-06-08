@@ -139,6 +139,42 @@ def view_experiment(experiment_id):
     return flask.render_template('experiment.html', **kwargs)
 
 
+@app.route('/metrics')
+def view_metrics():
+    metrics = get_all_experiment_metrics(config['EXPERIMENTS_DIR'])
+    all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
+    kwargs = {
+        'metrics': metrics,
+        'keys': sorted(list(all_keys))
+    }
+    return flask.render_template('metrics.html', **kwargs)
+
+
+def get_experiment_ids(experiments_dir):
+    return [d for d in os.listdir(experiments_dir) if os.path.isdir(os.path.join(experiments_dir, d))]
+
+
+def get_experiment_metrics(experiments_dir, experiment_id, number_format='%.04f'):
+    filename = os.path.join(experiments_dir, experiment_id, '.last_summary.json')
+    if os.path.exists(filename):
+        items = json.load(open(filename))
+        if number_format:
+            for k in items:
+                if isinstance(items[k], float):
+                    items[k] = number_format % items[k]
+        return items
+    print('Skipping {}'.format(filename))
+    return {}
+
+
+def get_all_experiment_metrics(experiments_dir):
+    experiment_ids = get_experiment_ids(experiments_dir)
+    metrics = {}
+    for eid in experiment_ids:
+        metrics[eid] = get_experiment_metrics(experiments_dir, eid)
+    return metrics
+
+
 # Tail -f the given filename in a websocket process
 # Return the port number of the running websocketd
 def spawn_console_websocket(filename):
