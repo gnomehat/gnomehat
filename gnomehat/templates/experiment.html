@@ -64,10 +64,18 @@ iframe {
   </div>
   <div class="container">
     <p style="margin-bottom:3px;">
-      <button class="tablink" onclick="openTab('console')" id="defaultOpen">Console</button>
-      <button class="tablink" onclick="openTab('files')">Files</button>
-      <button class="tablink" onclick="openTab('visualizations')">Visualizations</button>
-      <a id="tensorboard_link"><button class="tablink">Tensorboard</button></a>
+      <a href="#console">
+        <button class="tablink" onclick="openTab('console')" id="defaultOpen">Console</button>
+      </a>
+      <a href="#files">
+        <button class="tablink" onclick="openTab('files')">Files</button>
+      </a>
+      <a href="#visualizations">
+        <button class="tablink" onclick="openTab('visualizations')">Visualizations</button>
+      </a>
+      <a id="tensorboard_link">
+          <button class="tablink">Tensorboard</button>
+      </a>
     </p>
 
     <div id="console" class="tabcontent">
@@ -126,7 +134,7 @@ function openTab(pageName) {
 document.getElementById("defaultOpen").click();
 
 var tensorboard_url = "http://{{tensorboard_host}}:{{tensorboard_port}}";
-document.getElementById("tensorboard_link").href = tensorboard_url;
+document.getElementById("tensorboard_link").href = tensorboard_url + '#scalars';
 
 function toggleDisplay(elementId) {
     var element = document.getElementById(elementId);
