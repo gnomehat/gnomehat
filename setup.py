@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='gnomehat',
-        version='0.4.0',
+        version='0.4.1',
         description='GnomeHat makes it easy to run experiments.',
         author='Larry Neal',
         author_email='nealla@lwneal.com',
