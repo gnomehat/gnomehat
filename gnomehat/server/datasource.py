@@ -27,13 +27,12 @@ def get_results(files_url):
     result_dirs = result_dirs[-config['MAX_RESULTS']:]
 
     for dir_path in result_dirs:
-        dir_name = dir_path.split('/')[-1]
-        experiment_id = dir_name
+        experiment_id = dir_path.split('/')[-1]
         timestamp = int(os.path.getmtime(dir_path))
 
         started_at = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.timezone(TIMEZONE))
 
-        full_path = os.path.join(config['EXPERIMENTS_DIR'], dir_name)
+        full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
 
         dir_contents = get_dir_contents(full_path)
 
@@ -45,7 +44,7 @@ def get_results(files_url):
                 return os.path.getmtime(os.path.join(full_path,x))
             jpgs.sort(key=last_modified)
             last_modified_timestamp = last_modified(jpgs[-1])
-            image_url = '{}/{}/{}'.format(files_url, dir_name, jpgs[-1])
+            image_url = '{}/{}/{}'.format(files_url, experiment_id, jpgs[-1])
 
         running_job = os.path.exists(os.path.join(full_path, 'worker_lockfile'))
         finished_job = os.path.exists(os.path.join(full_path, 'worker_finished'))
@@ -69,11 +68,11 @@ def get_results(files_url):
         if is_experiment:
             headline = get_command(full_path)
 
-        notes = get_notes(dir_path)
+        notes = get_notes(experiment_id)
         if notes:
             subtitle = notes
         else:
-            subtitle = stdout_last_n_lines(dir_name, n=1)
+            subtitle = stdout_last_n_lines(experiment_id, n=1)
 
         metrics_summary = {}
         metrics_summary_filename = os.path.join(dir_path, '.last_summary.json')
@@ -89,7 +88,7 @@ def get_results(files_url):
             'experiment_name': experiment_name,
             'headline': headline,
             'subtitle': subtitle,
-            'dir_name': dir_name,
+            'dir_name': experiment_id,
             'name': experiment_id.replace('_', ' '),
             'start_timestamp': timestamp,
             'last_modified_timestamp': timestamp,
@@ -97,7 +96,7 @@ def get_results(files_url):
             'finished': finished_job,
             'color': color,
             'image_url': image_url,
-            'last_log_summary': get_log_summary(dir_name),
+            'last_log_summary': get_log_summary(experiment_id),
             'is_experiment': is_experiment,
             'metrics_summary': metrics_summary,
         }
@@ -107,7 +106,7 @@ def get_results(files_url):
 
 
 def get_notes(dir_path):
-    notes_filename = os.path.join(dir_path, 'gnomehat_notes.txt')
+    notes_filename = os.path.join(config['EXPERIMENTS_DIR'], dir_path, 'gnomehat_notes.txt')
     if os.path.exists(notes_filename):
         return open(notes_filename).read()
     return ''
@@ -179,6 +178,33 @@ def get_dir_images(dir_name):
     files = get_dir_contents(dir_name)
     return [f for f in files if has_image_extension(f)]
 
+
 def default_image_url():
     return os.path.join(flask.request.url_root, '/static/images/default.png')
 
+
+def get_experiment_ids(experiments_dir):
+    return [d for d in os.listdir(experiments_dir) if os.path.isdir(os.path.join(experiments_dir, d))]
+
+
+def get_experiment_metrics(experiments_dir, experiment_id, number_format=None):
+    filename = os.path.join(experiments_dir, experiment_id, '.last_summary.json')
+    if os.path.exists(filename):
+        items = json.load(open(filename))
+        if number_format:
+            for k in items:
+                if isinstance(items[k], float):
+                    items[k] = number_format % items[k]
+        return items
+    # No metrics available for this experiment
+    return {}
+
+
+def get_all_experiment_metrics(experiments_dir, include_notes=True, number_format='%.04f'):
+    experiment_ids = get_experiment_ids(experiments_dir)
+    metrics = {}
+    for eid in experiment_ids:
+        metrics[eid] = get_experiment_metrics(experiments_dir, eid, number_format)
+        if include_notes:
+            metrics[eid]['notes'] = get_notes(eid)
+    return metrics

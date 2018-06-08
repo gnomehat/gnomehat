@@ -17,7 +17,7 @@ import subprocess
 from gnomehat import sysinfo, hostinfo
 from gnomehat.server import app, config
 
-from gnomehat.server.datasource import get_results, get_images
+from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics
 
 # TODO: Rest of world
 TIMEZONE = 'US/Pacific'
@@ -148,31 +148,6 @@ def view_metrics():
         'keys': sorted(list(all_keys))
     }
     return flask.render_template('metrics.html', **kwargs)
-
-
-def get_experiment_ids(experiments_dir):
-    return [d for d in os.listdir(experiments_dir) if os.path.isdir(os.path.join(experiments_dir, d))]
-
-
-def get_experiment_metrics(experiments_dir, experiment_id, number_format='%.04f'):
-    filename = os.path.join(experiments_dir, experiment_id, '.last_summary.json')
-    if os.path.exists(filename):
-        items = json.load(open(filename))
-        if number_format:
-            for k in items:
-                if isinstance(items[k], float):
-                    items[k] = number_format % items[k]
-        return items
-    print('Skipping {}'.format(filename))
-    return {}
-
-
-def get_all_experiment_metrics(experiments_dir):
-    experiment_ids = get_experiment_ids(experiments_dir)
-    metrics = {}
-    for eid in experiment_ids:
-        metrics[eid] = get_experiment_metrics(experiments_dir, eid)
-    return metrics
 
 
 # Tail -f the given filename in a websocket process
