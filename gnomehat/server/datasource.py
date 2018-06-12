@@ -208,3 +208,25 @@ def get_all_experiment_metrics(experiments_dir, include_notes=True, number_forma
         if include_notes:
             metrics[eid]['notes'] = get_notes(eid)
     return metrics
+
+
+def get_directory_listing(full_path):
+    # Serve a directory of filenames
+    listing = []
+    for filename in os.listdir(full_path):
+        stat = os.stat(os.path.join(full_path, filename))
+        listing.append({
+            'name': filename,
+            'size': stat.st_size,
+            'last_modified': timestamp_to_str(stat.st_mtime),
+        })
+    listing.sort(key=lambda x: x['name'])
+    return listing
+
+
+def timestamp_to_str(timestamp):
+    timestamp = int(timestamp)
+    value = datetime.datetime.fromtimestamp(timestamp)
+    value.replace(tzinfo=pytz.timezone(TIMEZONE))
+    return value.strftime('%Y-%m-%d %H:%M:%S')
+

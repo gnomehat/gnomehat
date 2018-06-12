@@ -17,7 +17,7 @@ import subprocess
 from gnomehat import sysinfo, hostinfo
 from gnomehat.server import app, config
 
-from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics
+from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics, get_directory_listing
 
 # TODO: Rest of world
 TIMEZONE = 'US/Pacific'
@@ -61,27 +61,30 @@ def static_experiments_file(path):
         flask.abort(400)
     full_path = os.path.join(config['EXPERIMENTS_DIR'], path)
     if os.path.isdir(full_path):
-        # Serve a directory of filenames
-        listing = []
-        for filename in os.listdir(full_path):
-            stat = os.stat(os.path.join(full_path, filename))
-            listing.append({
-                'name': filename,
-                'size': stat.st_size,
-                'last_modified': timestamp_to_str(stat.st_mtime),
-            })
-        listing.sort(key=lambda x: x['name'])
+        listing = get_directory_listing(full_path)
         return flask.render_template('listing.html',
                                      files_url=get_files_url(),
                                      listing=listing, cwd=path)
     else:
         # Serve an ordinary file, defaulting to text
         TEXT_EXTENSIONS = ['txt', 'py', 'json', 'sh', 'c', 'gitignore', 'log']
-        mimetype = None
-        if path.lower().split('.')[-1] in TEXT_EXTENSIONS:
-            mimetype = 'text/plain'
+        extension = path.lower().split('.')[-1]
+        mimetype = 'text/plain' if extension in TEXT_EXTENSIONS else None
         return flask.send_from_directory(config['EXPERIMENTS_DIR'], path,
                                          mimetype=mimetype)
+
+
+@app.route('/experiment/<experiment_id>/files')
+def view_experiment_listing(experiment_id):
+    full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+    listing = get_directory_listing(full_path)
+    kwargs = {
+        'listing': listing,
+        'cwd': experiment_id,
+        'experiment_id': experiment_id,
+        'files_url': get_files_url(),
+    }
+    return flask.render_template('experiment_listing.html', **kwargs)
 
 
 @app.route('/delete_job', methods=['POST'])
@@ -129,10 +132,10 @@ def view_experiment(experiment_id):
 
     kwargs = {
         'experiment_id': experiment_id,
+        'files_url': get_files_url(),
         'image_groups': image_groups,
         'websocket_host': websocket_host(),
         'websocket_port': console_port,
-        'files_url': get_files_url(),
         'tensorboard_host': tensorboard_host(),
         'tensorboard_port': tensorboard_port,
     }
@@ -193,12 +196,4 @@ def tensorboard_host():
     host = flask.request.url_root.replace('http://', '').rstrip('/')
     host = host.split(':')[0]
     return host
-
-
-def timestamp_to_str(timestamp):
-    timestamp = int(timestamp)
-    value = datetime.datetime.fromtimestamp(timestamp)
-    value.replace(tzinfo=pytz.timezone(TIMEZONE))
-    return value.strftime('%Y-%m-%d %H:%M:%S')
-
 

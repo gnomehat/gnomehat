@@ -21,6 +21,13 @@
   <link rel="stylesheet" href="/static/css/experiment.css">
 
   <script type="text/javascript" src="/static/ws-repl.js"></script>
+
+  <style>
+iframe {
+    width: 100%;
+    height: 600px;
+}
+  </style>
 </head>
 <body>
   <div class="row">
@@ -32,13 +39,27 @@
   <div class="container">
     {% include 'experiment_header.html' %}
 
-    <div id="console" class="tabcontent">
-        <div id="repl" width=1024px></div>
-    </div>
-
+    {% include 'listing.html' %}
   </div>
 </body>
 <script>
+function openTab(pageName) {
+    var i, tabcontent, tablinks;
+    var visible_tab = document.getElementById(pageName);
+
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        if (tabcontent[i] == visible_tab) {
+            tabcontent[i].style.display = "block";
+        } else {
+            tabcontent[i].style.display = "none";
+        }
+    }
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+
 var tensorboard_url = "http://{{tensorboard_host}}:{{tensorboard_port}}";
 document.getElementById("tensorboard_link").href = tensorboard_url + '#scalars';
 
