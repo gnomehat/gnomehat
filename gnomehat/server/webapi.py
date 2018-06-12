@@ -35,6 +35,17 @@ def front_page():
     return flask.render_template('index.html', **kwargs)
 
 
+@app.route('/metrics')
+def view_metrics():
+    metrics = get_all_experiment_metrics(config['EXPERIMENTS_DIR'])
+    all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
+    kwargs = {
+        'metrics': metrics,
+        'keys': sorted(list(all_keys))
+    }
+    return flask.render_template('metrics.html', **kwargs)
+
+
 @app.route('/compare')
 def compare_experiments():
     start_time = time.time()
@@ -72,19 +83,6 @@ def static_experiments_file(path):
         mimetype = 'text/plain' if extension in TEXT_EXTENSIONS else None
         return flask.send_from_directory(config['EXPERIMENTS_DIR'], path,
                                          mimetype=mimetype)
-
-
-@app.route('/experiment/<experiment_id>/files')
-def view_experiment_listing(experiment_id):
-    full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
-    listing = get_directory_listing(full_path)
-    kwargs = {
-        'listing': listing,
-        'cwd': experiment_id,
-        'experiment_id': experiment_id,
-        'files_url': get_files_url(),
-    }
-    return flask.render_template('experiment_listing.html', **kwargs)
 
 
 @app.route('/delete_job', methods=['POST'])
@@ -142,15 +140,30 @@ def view_experiment(experiment_id):
     return flask.render_template('experiment.html', **kwargs)
 
 
-@app.route('/metrics')
-def view_metrics():
-    metrics = get_all_experiment_metrics(config['EXPERIMENTS_DIR'])
-    all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
+@app.route('/experiment/<experiment_id>/files')
+def view_experiment_listing(experiment_id):
+    full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+    listing = get_directory_listing(full_path)
     kwargs = {
-        'metrics': metrics,
-        'keys': sorted(list(all_keys))
+        'listing': listing,
+        'cwd': experiment_id,
+        'experiment_id': experiment_id,
+        'files_url': get_files_url(),
     }
-    return flask.render_template('metrics.html', **kwargs)
+    return flask.render_template('experiment_listing.html', **kwargs)
+
+
+@app.route('/experiment/<experiment_id>/tensorboard')
+def experiment_tensorboard(experiment_id):
+    # Spawn a Tensorboard server
+    tb_log_dir = os.path.join(config['EXPERIMENTS_DIR'], experiment_id, 'runs')
+    tensorboard_port = spawn_tensorboard(tb_log_dir)
+    tensorboard_url = 'http://{}:{}'.format(tensorboard_host(), tensorboard_port)
+
+    # HACK: Wait for tensorboard to load. TODO preload it
+    time.sleep(1)
+
+    return flask.redirect(tensorboard_url)
 
 
 # Tail -f the given filename in a websocket process

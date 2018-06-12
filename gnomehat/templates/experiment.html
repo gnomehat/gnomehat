@@ -39,18 +39,6 @@
   </div>
 </body>
 <script>
-var tensorboard_url = "http://{{tensorboard_host}}:{{tensorboard_port}}";
-document.getElementById("tensorboard_link").href = tensorboard_url + '#scalars';
-
-function toggleDisplay(elementId) {
-    var element = document.getElementById(elementId);
-    if (element.style.display === 'none') {
-        element.style.display = 'block';
-    } else {
-        element.style.display = 'none';
-    }
-}
-
 wsrepl({serverName: '{{ websocket_host }}', port: {{ websocket_port }} });
 </script>
 </html>
