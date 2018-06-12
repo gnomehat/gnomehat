@@ -166,6 +166,21 @@ def experiment_tensorboard(experiment_id):
     return flask.redirect(tensorboard_url)
 
 
+@app.route('/experiment/<experiment_id>/visdom')
+def experiment_visdom(experiment_id):
+    # Spawn a Visdom server, just an empty test page for now
+    # TODO: Include a default visdom.py that just prints all images
+    visdom_dir = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+    visdom_host = tensorboard_host()
+    visdom_port = spawn_visdom(visdom_dir)
+    visdom_url = 'http://{}:{}'.format(visdom_host, visdom_port)
+
+    # HACK: Wait for visdom to load. TODO preload it
+    time.sleep(1)
+
+    return flask.redirect(visdom_url)
+
+
 # Tail -f the given filename in a websocket process
 # Return the port number of the running websocketd
 def spawn_console_websocket(filename):
@@ -194,6 +209,19 @@ def spawn_tensorboard(logdir):
     return portnum
 
 
+def spawn_visdom(logdir):
+    # Clean up any previous unused sockets for this experiment
+    # TODO: something much much more sophisticated
+    os.system('pkill -f visdom.server')
+
+    portnum = random.randint(22000, 22999)
+    # TODO proper input sanitizing and process pool and resource management and and ...
+    cmd = 'python -m visdom.server -port {} & >/dev/null'.format(portnum)
+    print("Running {}".format(cmd))
+    os.system(cmd)
+    return portnum
+
+
 def get_files_url():
     return os.path.join(flask.request.url_root, 'experiments')
 
@@ -209,4 +237,3 @@ def tensorboard_host():
     host = flask.request.url_root.replace('http://', '').rstrip('/')
     host = host.split(':')[0]
     return host
-
