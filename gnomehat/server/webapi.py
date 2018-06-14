@@ -209,7 +209,7 @@ def spawn_tensorboard(logdir):
     return portnum
 
 
-def spawn_visdom(logdir):
+def spawn_visdom(experiment_dir):
     # Clean up any previous unused sockets for this experiment
     # TODO: something much much more sophisticated
     os.system('pkill -f visdom.server')
@@ -218,6 +218,10 @@ def spawn_visdom(logdir):
     # TODO proper input sanitizing and process pool and resource management and and ...
     cmd = 'python -m visdom.server -port {} & >/dev/null'.format(portnum)
     print("Running {}".format(cmd))
+    os.system(cmd)
+
+    # HACK: all these os.system() calls aren't funny any more, TODO refactor all of this
+    cmd = '(sleep 3; visdomino --port {} --dir {}) &'.format(portnum, experiment_dir)
     os.system(cmd)
     return portnum
 

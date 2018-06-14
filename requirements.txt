@@ -6,3 +6,4 @@ pytest
 pytz
 docopt
 requests
+git+https://github.com/lwneal/visdomino
