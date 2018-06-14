@@ -1,14 +1,8 @@
-    <p style="margin-bottom:3px;">
-      <a href="/experiment/{{experiment_id}}">
-        <button class="tablink">Console</button>
-      </a>
-      <a href="/experiment/{{experiment_id}}/files">
-        <button class="tablink">Files</button>
-      </a>
-      <a href="/experiment/{{experiment_id}}/visdom">
-        <button class="tablink">Visdom</button>
-      </a>
-      <a href="/experiment/{{experiment_id}}/tensorboard">
-          <button class="tablink">Tensorboard</button>
-      </a>
-    </p>
+<a href="/" class="tablink backbtn">Go Back</a>
+<h5>{{experiment_id}}</h5>
+<p class="row headrow">
+  <a href="/experiment/{{experiment_id}}" class="tablink">Ⓒ Console</a>
+  <a href="/experiment/{{experiment_id}}/files" class="tablink">Ⓕ Files</a>
+  <a href="/experiment/{{experiment_id}}/visdom" class="tablink">Ⓥ Visdom</a>
+  <a href="/experiment/{{experiment_id}}/tensorboard" class="tablink">Ⓣ Tensorboard</a>
+</p>

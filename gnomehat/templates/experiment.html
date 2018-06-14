@@ -23,19 +23,9 @@
   <script type="text/javascript" src="/static/ws-repl.js"></script>
 </head>
 <body>
-  <div class="row">
-    <a href="/" style="float:left; font-size:24px;">Go Back</a>
-    <center>
-      <h4>Experiment {{experiment_id}}</h4>
-    </center>
-  </div>
   <div class="container">
     {% include 'experiment_header.html' %}
-
-    <div id="console" class="tabcontent">
-        <div id="repl" width=1024px></div>
-    </div>
-
+    <div class="repl" id="repl"></div>
   </div>
 </body>
 <script>

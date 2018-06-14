@@ -33,7 +33,7 @@ var defArgs = {
     replMargin: '0.4em auto 0.4em 0.4em',
     replPadding: '0.4em',
     replHeight: '640px',
-    replWidth: '1024px',
+    replWidth: '900px',
     replBorderWidth: '0.1em',
     replBorderColor: '#000',
     replBorderStyle: 'solid',
