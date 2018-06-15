@@ -30,12 +30,7 @@ iframe {
   </style>
 </head>
 <body>
-  <div class="row">
-    <a href="/" style="float:left; font-size:24px;">Go Back</a>
-    <center>
-      <h4>Experiment {{experiment_id}}</h4>
-    </center>
-  </div>
+  {% include 'main_header.html' %}
   <div class="container">
     {% include 'experiment_header.html' %}
 
