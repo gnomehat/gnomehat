@@ -13,7 +13,7 @@ setup(name='gnomehat',
         ],
         package_data={
             'gnomehat': ['templates/*',
-                         'static/*.js',
+                         'static/js/*.js',
                          'static/fonts/*.otf',
                          'static/fonts/*.svg',
                          'static/fonts/*.woff',
