@@ -63,16 +63,13 @@ table {
 .tablink {
   width: 200px;
   color: blue;
-  border: 1;
-  outline: none;
   cursor: pointer;
   padding: 7px 16px;
-  font-size: 24px;
+  font-size: 18px;
   text-decoration: none;
 }
 
 .tablink:hover {
-  color: blue;
   background-color: #dddddd;
 }
 
