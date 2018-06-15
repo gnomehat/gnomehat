@@ -39,9 +39,13 @@ def front_page():
 def view_metrics():
     metrics = get_all_experiment_metrics(config['EXPERIMENTS_DIR'])
     all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
+    all_keys.remove('notes')
+    all_keys = list(sorted(all_keys))
+    all_keys.append('notes')
+
     kwargs = {
         'metrics': metrics,
-        'keys': sorted(list(all_keys))
+        'keys': all_keys
     }
     return flask.render_template('metrics.html', **kwargs)
 
