@@ -50,9 +50,8 @@ def view_metrics():
     return flask.render_template('metrics.html', **kwargs)
 
 
-@app.route('/demo')
+@app.route('/demos')
 def view_demos():
-    start_time = time.time()
     kwargs = {
         'demos': [
             {'name': 'variational-autoencoder'},
@@ -61,6 +60,12 @@ def view_demos():
         'files_url': get_files_url(),
     }
     return flask.render_template('demos.html', **kwargs)
+
+
+@app.route('/demos/<demo_name>')
+def run_demo(demo_name):
+    # TODO: gnomehat-run the demo in question, redirect to its experiment
+    return "TODO: Run demo {}".format(demo_name)
 
 
 @app.route('/static/<path:path>')
