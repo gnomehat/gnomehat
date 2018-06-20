@@ -50,16 +50,17 @@ def view_metrics():
     return flask.render_template('metrics.html', **kwargs)
 
 
-@app.route('/compare')
-def compare_experiments():
+@app.route('/demo')
+def view_demos():
     start_time = time.time()
     kwargs = {
-        'results': get_results(get_files_url()),
+        'demos': [
+            {'name': 'variational-autoencoder'},
+            {'name': 'classifier-cifar10'},
+        ],
         'files_url': get_files_url(),
     }
-    print("Generated results for front page in {:.2f} sec".format(
-        time.time() - start_time))
-    return flask.render_template('comparison.html', **kwargs)
+    return flask.render_template('demos.html', **kwargs)
 
 
 @app.route('/static/<path:path>')
