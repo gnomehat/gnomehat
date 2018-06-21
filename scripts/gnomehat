@@ -120,6 +120,17 @@ def get_experiments_dir():
     return experiments_dir
 
 
+def gnomehat_demo(experiments_dir, demo_name):
+    DEMOS_GIT_URL = 'https://github.com/lwneal/'
+    clone_cmd = ['git', 'clone', '{}/{}'.format(DEMOS_GIT_URL, demo_name)]
+    subprocess.run(clone_cmd)
+
+    os.chdir(demo_name)
+
+    run_cmd = ['gnomehat', 'python', 'main.py']
+    subprocess.run(run_cmd)
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('Usage:')
@@ -147,6 +158,10 @@ if __name__ == '__main__':
     elif command == 'restart-server':
         experiments_dir = get_experiments_dir()
         gnomehat_restart_server(experiments_dir)
+    elif command == 'demo':
+        experiments_dir = get_experiments_dir()
+        demo_name = sys.argv[2]
+        gnomehat_demo(experiments_dir, demo_name)
     else:
-        # The command 'gnomehat train.py' is an alias for gnomehat_run
+        # The command 'gnomehat python train.py' is an alias for gnomehat_run
         subprocess.run(['gnomehat_run'] + sys.argv[1:])

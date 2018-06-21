@@ -26,50 +26,28 @@
         <input class="search" type="text" id="resultSearchInput" onkeyup="filterResults()" placeholder="Search for results..">
         <br>
 
+        {% for demo in demos: %}
         <div class="gradient blueish">
           <div class="content" style="float: left">
             <div class="clickables">
-              <a onclick="alert()">O</a>
               <br>
             </div>
-            <a href="demos/variational-autoencoder-mnist">
+            <a href="demos/variational-autoencoder">
               <span class=big>
-                <span class="experiment_name">Variational Autoencoder: MNIST</span>
+                <span class="experiment_name">{{demo['title']}}</span>
                 <br>
-                <span class="headline">large text here</span>
+                <span class="headline">{{demo['description']}}</span>
                 <br>
-                <pre class="subtitle">hello subtitle</pre>
+                <pre class="subtitle">gnomehat demo {{demo['name']}}</pre>
               </span>
             </a>
           </div>
           <div class="img_holder" height=128>
-              <img src="static/images/default.jpg" height=128 />
+              <img src="{{demo['image_url']}}" height=128 />
           </div>
           <br>
         </div>
-
-        <div class="gradient blueish">
-          <div class="content" style="float: left">
-            <div class="clickables">
-              <a onclick="alert()">O</a>
-              <br>
-            </div>
-            <a href="demos/variational-autoencoder-mnist">
-              <span class=big>
-                <span class="experiment_name">Some Other Demo</span>
-                <br>
-                <span class="headline">large text here</span>
-                <br>
-                <pre class="subtitle">hello subtitle</pre>
-              </span>
-            </a>
-          </div>
-          <div class="img_holder" height=128>
-              <img src="static/images/default.jpg" height=128 />
-          </div>
-          <br>
-        </div>
-
+        {%endfor%}
 
       </div>
     </div>

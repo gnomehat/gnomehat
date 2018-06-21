@@ -53,9 +53,17 @@ def view_metrics():
 @app.route('/demos')
 def view_demos():
     kwargs = {
-        'demos': [
-            {'name': 'variational-autoencoder'},
-            {'name': 'classifier-cifar10'},
+        'demos': [{
+            'name': 'variational-autoencoder',
+            'title': 'Variational Autoencoder',
+            'description': 'Reconstruct MNIST digits with a variational autoencoder',
+            'image_url': 'static/images/default.png',
+            }, {
+            'name': 'classifier-cifar10',
+            'title': 'Image Classifier',
+            'description': 'Train a convolutional network to classify CIFAR10 images',
+            'image_url': 'static/images/default.png',
+            },
         ],
         'files_url': get_files_url(),
     }
