@@ -226,7 +226,7 @@ def spawn_tensorboard(logdir):
 
     portnum = random.randint(21000, 21999)
     # TODO proper input sanitizing and process pool and resource management and and ...
-    cmd = 'tensorboard --logdir {} --port {} & >/dev/null'.format(logdir, portnum)
+    cmd = 'CUDA_VISIBLE_DEVICES="" tensorboard --logdir {} --port {} & >/dev/null'.format(logdir, portnum)
     print("Running {}".format(cmd))
     os.system(cmd)
     return portnum
