@@ -12,6 +12,7 @@ WEBSOCKETD_CHECKSUM = '03b8d90b4ac1f58469965c133cf3dd9c43dc0811e525b2319df578e70
 
 class PostInstallCommand(install):
     def run(self):
+        print('Installing websocketd from {}'.format(WEBSOCKETD_URL))
         install_websocketd('~/bin')
         install.run(self)
 
