@@ -63,6 +63,11 @@ def view_demos():
             'title': 'Image Classifier',
             'description': 'Train a convolutional network to classify CIFAR10 images',
             'image_url': 'static/images/default.png',
+            }, {
+            'name': 'Mask_RCNN',
+            'title': 'Semantic Segmentation',
+            'description': 'Detect and outline people, cars, animals and more in input images.',
+            'image_url': 'static/images/default.png',
             },
         ],
         'files_url': get_files_url(),
