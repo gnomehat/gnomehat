@@ -12,6 +12,7 @@
 
   <link rel="icon" type="image/png" href="static/images/favicon.png">
 
+  <script src="static/js/sorttable.js"></script>
   <script>
 function filterResults() {
     console.log('TODO: filter results');
@@ -36,7 +37,7 @@ function filterResults() {
     </div>
   </div>
 
-  <table>
+  <table class="sortable">
   <tr>
     <th>
       Experiment Name
@@ -54,7 +55,7 @@ function filterResults() {
         <a href="/experiment/{{experiment_id}}">{{experiment_id}}</a>
     </td>
     {% for key in keys: %}
-      <td>{{metrics[experiment_id].get(key, 'N/A')}}</td>
+      <td>{{metrics[experiment_id].get(key, '-')}}</td>
     {% endfor %}
   </tr>
   {% endfor %}
