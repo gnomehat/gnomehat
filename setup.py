@@ -21,8 +21,9 @@ def install_websocketd(bin_dir):
     bin_dir = os.path.expanduser(bin_dir)
     os.makedirs(bin_dir, exist_ok=True)
     filepath = os.path.join(bin_dir, WEBSOCKETD_FILENAME)
-    subprocess.run(['wget', '--no-clobber', '-P', bin_dir, WEBSOCKETD_URL])
-    subprocess.run(['unzip', '-d', bin_dir, filepath])
+    if not os.path.exists(os.path.join(bin_dir, 'websocketd')):
+        subprocess.run(['wget', '--no-clobber', '-P', bin_dir, WEBSOCKETD_URL])
+        subprocess.run(['unzip', '-d', bin_dir, filepath])
 
 
 setup(name='gnomehat',
