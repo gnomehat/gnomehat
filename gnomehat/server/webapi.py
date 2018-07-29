@@ -54,6 +54,21 @@ def view_metrics():
 def view_demos():
     kwargs = {
         'demos': [{
+            'name': 'Mask_RCNN',
+            'title': 'Semantic Segmentation',
+            'description': 'Detect and outline people, cars, animals and more in input images.',
+            'image_url': 'static/images/default.png',
+            }, {
+            'name': 'progressive_growing_of_gans',
+            'title': 'Progressive Growing of Generative Adversarial Networks',
+            'description': 'Generate photorealistic faces of fake celebrities',
+            'image_url': 'static/images/default.png',
+            }, {
+            'name': 'char_rnn',
+            'title': 'Recurrent Neural Network for Text',
+            'description': 'Generate encyclopedia articles, biblical verses, and political speeches.',
+            'image_url': 'static/images/default.png',
+            }, {
             'name': 'variational-autoencoder',
             'title': 'Variational Autoencoder',
             'description': 'Reconstruct MNIST digits with a variational autoencoder',
@@ -64,11 +79,11 @@ def view_demos():
             'description': 'Train a convolutional network to classify CIFAR10 images',
             'image_url': 'static/images/default.png',
             }, {
-            'name': 'Mask_RCNN',
-            'title': 'Semantic Segmentation',
-            'description': 'Detect and outline people, cars, animals and more in input images.',
+            'name': 'open-set-classifier',
+            'title': 'Open Set Image Classifier',
+            'description': 'Train a convolutional network to classify CIFAR10 images, and to detect outlier/anomaly images',
             'image_url': 'static/images/default.png',
-            },
+            }
         ],
         'files_url': get_files_url(),
     }

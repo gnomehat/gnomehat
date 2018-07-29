@@ -121,10 +121,12 @@ def get_experiments_dir():
 
 
 def gnomehat_demo(experiments_dir, demo_name):
+    TMP_DIR = '/tmp'
+    os.chdir(TMP_DIR)
+
     DEMOS_GIT_URL = 'https://github.com/lwneal/'
     clone_cmd = ['git', 'clone', '{}/{}'.format(DEMOS_GIT_URL, demo_name)]
     subprocess.run(clone_cmd)
-
     os.chdir(demo_name)
 
     run_cmd = ['gnomehat', 'python', 'main.py']
