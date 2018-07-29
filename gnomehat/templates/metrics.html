@@ -15,8 +15,34 @@
   <script src="static/js/sorttable.js"></script>
   <script>
 function filterResults() {
-    console.log('TODO: filter results');
+    var input = document.getElementById("resultSearchInput");
+    var filter = input.value.toUpperCase();
+    var resultsList = document.getElementById("resultsList");
+    var results = resultsList.getElementsByClassName("resultRow");
+
+    var visibleCount = 0;
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < results.length; i++) {
+        div = results[i];
+        if (div.innerHTML.toUpperCase().indexOf(filter) > -1) {
+            div.style.display = "block";
+            visibleCount++;
+        } else {
+            div.style.display = "none";
+        }
+    }
+    if (visibleCount < results.length) {
+        setResultText('Displaying ' + visibleCount + ' of ');
+    } else {
+        setResultText('');
+    }
 }
+
+function setResultText(text) {
+    var resultText = document.getElementById("resultDisplayCount");
+    resultText.innerHTML = text;
+}
+
   </script>
 
 </head>
@@ -50,7 +76,7 @@ function filterResults() {
   </tr>
 
   {% for experiment_id in metrics: %}
-  <tr class="resultrow">
+  <tr class="resultRow">
     <td>
         <a href="/experiment/{{experiment_id}}">{{experiment_id}}</a>
     </td>
