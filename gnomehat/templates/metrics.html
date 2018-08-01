@@ -17,8 +17,8 @@
 function filterResults() {
     var input = document.getElementById("resultSearchInput");
     var filter = input.value.toUpperCase();
-    var resultsList = document.getElementById("resultsList");
-    var results = resultsList.getElementsByClassName("resultRow");
+    var results = document.getElementsByClassName("resultRow");
+    console.log('filterResults got ' + results.length + ' results');
 
     var visibleCount = 0;
     // Loop through all table rows, and hide those who don't match the search query
@@ -54,12 +54,10 @@ function setResultText(text) {
   <br>
   <div class="container">
     <div class="row" id="results">
-      <div class="column" id="resultsList">
-        <span id="resultDisplayCount"></span>
+      <span id="resultDisplayCount"></span>
         {{ metrics | length }} recent results.
-        <br>
-        <input class="search" type="text" id="resultSearchInput" onkeyup="filterResults()" placeholder="Search for results..">
-      </div>
+      <br>
+      <input class="search" type="text" id="resultSearchInput" onkeyup="filterResults()" placeholder="Search for results..">
     </div>
   </div>
 
