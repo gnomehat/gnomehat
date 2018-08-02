@@ -27,8 +27,8 @@ def install_websocketd(bin_dir):
 
 
 setup(name='gnomehat',
-        version='0.4.9',
-        description='GnomeHat makes it easy to run experiments.',
+        version='0.5.0',
+        description='GnomeHat - the stupid experiment control tool',
         author='Larry Neal',
         author_email='nealla@lwneal.com',
         packages=[
