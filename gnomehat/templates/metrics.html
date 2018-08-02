@@ -15,17 +15,18 @@
   <script src="static/js/sorttable.js"></script>
   <script>
 function filterResults() {
+    var startTime = new Date().getTime();
     var input = document.getElementById("resultSearchInput");
     var filter = input.value.toUpperCase();
     var results = document.getElementsByClassName("resultRow");
-    console.log('filterResults got ' + results.length + ' results');
+    console.log('filterResults() filtering ' + results.length + ' results');
 
     var visibleCount = 0;
     // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < results.length; i++) {
         div = results[i];
         if (div.innerHTML.toUpperCase().indexOf(filter) > -1) {
-            div.style.display = "block";
+            div.style.display = "";
             visibleCount++;
         } else {
             div.style.display = "none";
@@ -36,6 +37,30 @@ function filterResults() {
     } else {
         setResultText('');
     }
+
+    // Loop through all table columns, and hide those with no visible values
+    var headers = document.getElementsByClassName('metric_key_header');
+    for (i = 0; i < headers.length; i++) {
+        headers[i].style.display = '';
+        var cell_name = 'data_cell_' + i;
+        var cells = document.getElementsByName(cell_name);
+        var visible = false;
+        for (j = 0; j < cells.length; j++) {
+            cells[j].style.display = '';
+            if (cells[j].parentNode.style.display == '' && cells[j].innerHTML != '-') {
+                visible = true;
+            }
+        }
+        // If a column should be hidden, hide its header and cells
+        if (visible == false) {
+            headers[i].style.display = 'none';
+            for (j = 0; j < cells.length; j++) {
+                cells[j].style.display = 'none';
+            }
+        }
+    }
+    var endTime = new Date().getTime();
+    console.log('filterResults() finished in ' + (endTime - startTime) + ' msec');
 }
 
 function setResultText(text) {
@@ -67,9 +92,7 @@ function setResultText(text) {
       Experiment Name
     </th>
     {% for key in keys %}
-    <th>
-        {{key}}
-    </th>
+    <th class="metric_key_header">{{key}}</th>
     {% endfor %}
   </tr>
 
@@ -79,7 +102,7 @@ function setResultText(text) {
         <a href="/experiment/{{experiment_id}}">{{experiment_id}}</a>
     </td>
     {% for key in keys: %}
-      <td>{{metrics[experiment_id].get(key, '-')}}</td>
+    <td name="data_cell_{{loop.index - 1}}">{{metrics[experiment_id].get(key, '-')}}</td>
     {% endfor %}
   </tr>
   {% endfor %}
