@@ -47,7 +47,7 @@ def run_worker(experiments_dir, gpu_idx):
     # Redirect stdout and stderr to a worker log file
     os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_idx)
     log_filename = '{}/worker_{}_{}.txt'.format(experiments_dir, socket.gethostname(), gpu_idx)
-    cmd = 'nohup gnomehat_worker {} > {} 2>&1 &'.format(experiments_dir, log_filename)
+    cmd = 'nohup gnomehat_worker {} >> {} 2>&1 &'.format(experiments_dir, log_filename)
     os.system(cmd)
 
 
@@ -133,6 +133,11 @@ def gnomehat_demo(experiments_dir, demo_name):
     subprocess.run(run_cmd)
 
 
+def gnomehat_logs(experiments_dir):
+    # todo: security
+    os.system('tail -f {}/*.txt'.format(experiments_dir))
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('Usage:')
@@ -164,6 +169,9 @@ if __name__ == '__main__':
         experiments_dir = get_experiments_dir()
         demo_name = sys.argv[2]
         gnomehat_demo(experiments_dir, demo_name)
+    elif command == 'logs':
+        experiments_dir = get_experiments_dir()
+        gnomehat_logs(experiments_dir)
     else:
         # The command 'gnomehat python train.py' is an alias for gnomehat_run
         subprocess.run(['gnomehat_run'] + sys.argv[1:])
