@@ -69,7 +69,7 @@ def get_demos():
         'name': 'progressive_growing_of_gans',
         'title': 'Progressive Growing of Generative Adversarial Networks',
         'description': 'Generate photorealistic faces of fake celebrities',
-        'image_url': 'static/images/default.png',
+        'image_url': 'static/images/screenshot_progressive_growing_of_gans.jpg',
         }, {
         'name': 'char_rnn',
         'title': 'Recurrent Neural Network for Text',
