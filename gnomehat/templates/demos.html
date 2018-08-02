@@ -27,26 +27,26 @@
         <br>
 
         {% for demo in demos: %}
+        <a href="demos/{{demo['name']}}">
         <div class="gradient blueish">
           <div class="content" style="float: left">
             <div class="clickables">
               <br>
             </div>
-            <a href="demos/{{demo['name']}}">
               <span class=big>
                 <span class="experiment_name">{{demo['title']}}</span>
                 <br>
                 <span class="headline">{{demo['description']}}</span>
                 <br>
-                <pre class="subtitle">gnomehat demo {{demo['name']}}</pre>
+                <pre class="subtitle">https://www.github.com/lwneal/{{demo['name']}}</pre>
               </span>
-            </a>
           </div>
           <div class="img_holder" height=128>
               <img src="{{demo['image_url']}}" height=128 />
           </div>
           <br>
         </div>
+        </a>
         {%endfor%}
 
       </div>
