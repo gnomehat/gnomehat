@@ -47,6 +47,7 @@ setup(name='gnomehat',
                          'static/fonts/*.eot',
                          'static/css/*.css',
                          'static/images/*.png',
+                         'static/images/*.jpg',
                          ]
         },
         scripts=['scripts/gnomehat_server',

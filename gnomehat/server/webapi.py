@@ -53,47 +53,57 @@ def view_metrics():
 @app.route('/demos')
 def view_demos():
     kwargs = {
-        'demos': [{
-            'name': 'Mask_RCNN',
-            'title': 'Semantic Segmentation',
-            'description': 'Detect and outline people, cars, animals and more in input images.',
-            'image_url': 'static/images/default.png',
-            }, {
-            'name': 'progressive_growing_of_gans',
-            'title': 'Progressive Growing of Generative Adversarial Networks',
-            'description': 'Generate photorealistic faces of fake celebrities',
-            'image_url': 'static/images/default.png',
-            }, {
-            'name': 'char_rnn',
-            'title': 'Recurrent Neural Network for Text',
-            'description': 'Generate encyclopedia articles, biblical verses, and political speeches.',
-            'image_url': 'static/images/default.png',
-            }, {
-            'name': 'variational-autoencoder',
-            'title': 'Variational Autoencoder',
-            'description': 'Reconstruct MNIST digits with a variational autoencoder',
-            'image_url': 'static/images/default.png',
-            }, {
-            'name': 'classifier-cifar10',
-            'title': 'Image Classifier',
-            'description': 'Train a convolutional network to classify CIFAR10 images',
-            'image_url': 'static/images/default.png',
-            }, {
-            'name': 'open-set-classifier',
-            'title': 'Open Set Image Classifier',
-            'description': 'Train a convolutional network to classify CIFAR10 images, and to detect outlier/anomaly images',
-            'image_url': 'static/images/default.png',
-            }
-        ],
+        'demos': get_demos(),
         'files_url': get_files_url(),
     }
     return flask.render_template('demos.html', **kwargs)
 
 
+def get_demos():
+    return [{
+        'name': 'Mask_RCNN',
+        'title': 'Semantic Segmentation',
+        'description': 'Detect and outline people, cars, animals and more in input images.',
+        'image_url': 'static/images/screenshot_Mask_RCNN.jpg',
+        }, {
+        'name': 'progressive_growing_of_gans',
+        'title': 'Progressive Growing of Generative Adversarial Networks',
+        'description': 'Generate photorealistic faces of fake celebrities',
+        'image_url': 'static/images/default.png',
+        }, {
+        'name': 'char_rnn',
+        'title': 'Recurrent Neural Network for Text',
+        'description': 'Generate encyclopedia articles, biblical verses, and political speeches.',
+        'image_url': 'static/images/default.png',
+        }, {
+        'name': 'variational-autoencoder',
+        'title': 'Variational Autoencoder',
+        'description': 'Reconstruct MNIST digits with a variational autoencoder',
+        'image_url': 'static/images/default.png',
+        }, {
+        'name': 'classifier-cifar10',
+        'title': 'Image Classifier',
+        'description': 'Train a convolutional network to classify CIFAR10 images',
+        'image_url': 'static/images/default.png',
+        }, {
+        'name': 'open-set-classifier',
+        'title': 'Open Set Image Classifier',
+        'description': 'Train a convolutional network to classify CIFAR10 images, and to detect outlier/anomaly images',
+        'image_url': 'static/images/default.png',
+        }
+    ]
+
+
 @app.route('/demos/<demo_name>')
 def run_demo(demo_name):
-    # TODO: gnomehat-run the demo in question, redirect to its experiment
-    return "TODO: Run demo {}".format(demo_name)
+    assert demo_name in [demo['name'] for demo in get_demos()]
+
+    # can't see any way this might possibly go wrong
+    # todo: proper temp dir that cleans itself up
+    os.chdir('/tmp')
+    cmd = 'rm -rf {0}; (gnomehat demo {0}; rm -rf {0}) &'.format(demo_name)
+    subprocess.run(cmd, shell=True)
+    return flask.redirect('/')
 
 
 @app.route('/static/<path:path>')
