@@ -73,8 +73,8 @@ def get_demos():
         }, {
         'name': 'char_rnn',
         'title': 'Recurrent Neural Network for Text',
-        'description': 'Generate encyclopedia articles, biblical verses, and political speeches.',
-        'image_url': 'static/images/default.png',
+        'description': 'Generate Shakespeare, encyclopedia articles, and more.',
+        'image_url': 'static/images/screenshot_char_rnn.jpg',
         }, {
         'name': 'variational-autoencoder',
         'title': 'Variational Autoencoder',
