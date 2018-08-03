@@ -85,12 +85,9 @@ def get_demos():
         'title': 'Image Classifier',
         'description': 'Use Gnomehat to find the best parameters for training a classification network.',
         'image_url': 'static/images/screenshot_classifier_cifar10.jpg',
-        }, {
-        'name': 'open-set-classifier',
-        'title': 'Open Set Image Classifier',
-        'description': 'Train a convolutional network to classify CIFAR10 images, and to detect outlier/anomaly images',
-        'image_url': 'static/images/default.png',
-        }
+        },
+        # TODO: open set classifier
+        # TODO: Starcraft II reinforcement learning
     ]
 
 
