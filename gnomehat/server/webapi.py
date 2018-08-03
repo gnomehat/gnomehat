@@ -145,6 +145,11 @@ def delete_job():
 @app.route('/stop_job', methods=['POST'])
 def stop_job():
     print("Stop job: {}".format(flask.request.get_json()))
+    job_id = flask.request.get_json()['id']
+    filename = os.path.join(config['EXPERIMENTS_DIR'], job_id, 'worker_finished')
+    print('Writing {}'.format(filename))
+    with open(filename, 'w') as fp:
+        fp.write('OK')
     return 'OK'
 
 

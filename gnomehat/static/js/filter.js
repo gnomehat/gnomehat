@@ -38,7 +38,7 @@ function toggleDisplay(elementId) {
 
 function deleteExperiment(resultName) {
     if (confirm("Delete experiment " + resultName + "?")) {
-        console.log("DELETING");
+        console.log("Deleting experiment " + resultName);
         xhr = new XMLHttpRequest();
         xhr.open('POST', 'delete_job');
         xhr.onload = function() {
@@ -49,12 +49,23 @@ function deleteExperiment(resultName) {
             'id': resultName
         }));
     } else {
-        console.log("NOT DELETING");
+        console.log('Not deleting ' + resultName);
     }
 }
 
 function stopExperiment(resultName) {
     if (confirm("Stop experiment " + resultName + "?")) {
-        console.log('TODO');
+        console.log("Stopping experiment " + resultName);
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'stop_job');
+        xhr.onload = function() {
+            console.log(xhr.responseText);
+        }
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            'id': resultName
+        }));
+    } else {
+        console.log('Not stopping ' + resultName);
     }
 }
