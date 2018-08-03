@@ -36,7 +36,7 @@ function toggleDisplay(elementId) {
     }
 }
 
-function deleteResult(resultName) {
+function deleteExperiment(resultName) {
     if (confirm("Delete experiment " + resultName + "?")) {
         console.log("DELETING");
         xhr = new XMLHttpRequest();

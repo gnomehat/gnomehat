@@ -41,7 +41,7 @@
         <div class="gradient {{result['color']}}">
           <div class="content" style="float: left">
             <div class="clickables">
-              <a onclick="deleteResult('{{result['dir_name']}}');">♻</a>
+              <a onclick="deleteExperiment('{{result['dir_name']}}');">♻</a>
               <br>
               {% if not result['finished']: %}
               <a onclick="stopExperiment('{{result['dir_name']}}');">☓</a>

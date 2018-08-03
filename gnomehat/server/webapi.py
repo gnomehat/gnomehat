@@ -142,6 +142,12 @@ def delete_job():
     return 'OK'
 
 
+@app.route('/stop_job', methods=['POST'])
+def stop_job():
+    print("Stop job: {}".format(flask.request.get_json()))
+    return 'OK'
+
+
 @app.route('/info')
 def get_info():
     info = hostinfo.get_hostinfo(config['EXPERIMENTS_DIR'])
