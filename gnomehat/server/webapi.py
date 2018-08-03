@@ -79,12 +79,12 @@ def get_demos():
         'name': 'variational-autoencoder',
         'title': 'Variational Autoencoder',
         'description': 'Reconstruct MNIST digits with a variational autoencoder',
-        'image_url': 'static/images/default.png',
+        'image_url': 'static/images/screenshot_variational_autoencoder.jpg',
         }, {
         'name': 'classifier-cifar10',
         'title': 'Image Classifier',
-        'description': 'Train a convolutional network to classify CIFAR10 images',
-        'image_url': 'static/images/default.png',
+        'description': 'Use Gnomehat to find the best parameters for training a classification network.',
+        'image_url': 'static/images/screenshot_classifier_cifar10.jpg',
         }, {
         'name': 'open-set-classifier',
         'title': 'Open Set Image Classifier',
