@@ -23,16 +23,30 @@
     <br>
     <div class="row" id="results">
       <div class="column" id="resultsList">
-        <input class="search" type="text" id="resultSearchInput" onkeyup="filterResults()" placeholder="Search for results..">
         <br>
 
         {% for demo in demos: %}
         <a href="demos/{{demo['name']}}">
         <div class="gradient blueish" height=256>
+{% if loop.index is divisibleby(2) %}
+          <div class="img_holder" height=256 style="float:left">
+              <img src="{{demo['image_url']}}" height=256 />
+          </div>
+          <div class="content" style="padding: 24px">
+              <span style="margin:12px"></span>
+              <span class=big>
+                <b>
+                <span class="experiment_name">{{demo['title']}}</span>
+                </b>
+                <br>
+                <span class="headline">{{demo['description']}}</span>
+                <br>
+                https://www.github.com/lwneal/{{demo['name']}}
+              </span>
+          </div>
+{% else %}
           <div class="content" style="float: left">
-            <div class="clickables">
-              <br>
-            </div>
+              <span style="margin:12px"></span>
               <span class=big>
                 <b>
                 <span class="experiment_name">{{demo['title']}}</span>
@@ -46,6 +60,7 @@
           <div class="img_holder" height=256>
               <img src="{{demo['image_url']}}" height=256 />
           </div>
+{% endif %}
           <br>
         </div>
         </a>
