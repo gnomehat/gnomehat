@@ -105,6 +105,29 @@ def get_results(files_url):
     return sorted(results, key=lambda x: x['last_modified_timestamp'], reverse=True)
 
 
+def get_worker_count():
+    # TODO: Get more information about workers: GPUs, etc
+    def parse_worker_filename(filename):
+        if not filename.endswith('.txt'):
+            return None
+        tokens = filename.replace('.txt', '').split('_')
+        if len(tokens) != 3:
+            return None
+        return tokens[1], tokens[2]
+
+    workers = []
+    experiment_listings = os.listdir(config['EXPERIMENTS_DIR'])
+    for filename in experiment_listings:
+        parsed = parse_worker_filename(filename)
+        if parsed:
+            workers.append(parsed)
+    return len(workers)
+
+
+def get_server_title():
+    return config.get('GNOMEHAT_SERVER_TITLE', 'Gnomehat Experiments')
+
+
 def get_notes(dir_path):
     notes_filename = os.path.join(config['EXPERIMENTS_DIR'], dir_path, 'gnomehat_notes.txt')
     if os.path.exists(notes_filename):

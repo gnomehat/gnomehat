@@ -17,7 +17,8 @@ import subprocess
 from gnomehat import sysinfo, hostinfo
 from gnomehat.server import app, config
 
-from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics, get_directory_listing
+from gnomehat.server import datasource
+from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics, get_directory_listing, get_worker_count
 
 # TODO: Rest of world
 TIMEZONE = 'US/Pacific'
@@ -29,6 +30,8 @@ def front_page():
     kwargs = {
         'results': get_results(get_files_url()),
         'files_url': get_files_url(),
+        'worker_count': get_worker_count(),
+        'server_title': datasource.get_server_title(),
     }
     print("Generated results for front page in {:.2f} sec".format(
         time.time() - start_time))

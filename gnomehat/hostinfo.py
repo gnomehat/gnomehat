@@ -15,12 +15,18 @@ def init_hostinfo(config):
         hostname = os.environ.get('GNOMEHAT_SERVER_URL')
     else:
         hostname = socket.gethostname()
+
     info = {
         'hostname': hostname,
         'port': port,
         'gui_url': 'http://{}:{}'.format(hostname, port),
         'experiments_dir': experiments_dir,
     }
+
+    # export GNOMEHAT_SERVER_URL=thismachine.mydomain.com to start a cluster
+    if os.environ.get('GNOMEHAT_SERVER_TITLE'):
+        info['server_title'] = os.environ.get('GNOMEHAT_SERVER_TITLE')
+
     filename = os.path.join(experiments_dir, 'hostinfo.json')
     with open(filename, 'w') as fp:
         fp.write(json.dumps(info, indent=2))
