@@ -41,7 +41,10 @@ def get_results(files_url):
         jpgs = [filename for filename in dir_contents if has_image_extension(filename)]
         if jpgs:
             def last_modified(x):
-                return os.path.getmtime(os.path.join(full_path,x))
+                try:
+                    return os.path.getmtime(os.path.join(full_path,x))
+                except:
+                    return 0
             jpgs.sort(key=last_modified)
             last_modified_timestamp = last_modified(jpgs[-1])
             image_url = '{}/{}/{}'.format(files_url, experiment_id, jpgs[-1])
