@@ -25,6 +25,7 @@ def configure_logger(experiments_dir):
     timestamp = str(int(time.time()))
     log_filename = os.path.join(experiments_dir, 'worker_{}.txt'.format(timestamp))
     logger.addHandler(logging.FileHandler(log_filename))
+    logger.setLevel(logging.DEBUG)
 
 
 def chat_notification(msg):
