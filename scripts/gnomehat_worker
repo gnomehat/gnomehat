@@ -59,8 +59,21 @@ def getinfo():
     return json.dumps(info)
 
 
+# TODO: find a better name for this function
+def gpu_is_in_use(gpu_id):
+    cmd = ['nvidia-smi', '-q', '-i', str(gpu_id)]
+    text = subprocess.check_output(cmd)
+    text = str(text)
+    if 'Used GPU Memory' in text:
+        return True
+    return False
+
+
 def run_experiments(experiments_dir):
     log('Worker waking up...')
+    if gpu_is_in_use(get_gpu()):
+        log('GPU {} is being used, going back to sleep'.format(get_gpu()))
+        return
     experiments = os.listdir(experiments_dir)
     for name in experiments:
         dirname = os.path.join(experiments_dir, name)
@@ -145,7 +158,7 @@ def main(experiments_dir):
     while True:
         log('Worker looking for jobs...')
         run_experiments(experiments_dir)
-        time.sleep(3)
+        time.sleep(5)
 
 
 if __name__ == '__main__':
