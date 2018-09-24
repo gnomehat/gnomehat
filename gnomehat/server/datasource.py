@@ -184,7 +184,7 @@ def get_images(experiment_id):
 
 
 def has_image_extension(filename):
-    return any(filename.endswith(ext) for ext in config['IMAGE_EXTENSIONS'])
+    return any(filename.endswith('.' + ext) for ext in config['IMAGE_EXTENSIONS'])
 
 
 # TODO: Allow deeper search?
