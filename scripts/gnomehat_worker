@@ -155,7 +155,7 @@ def execute_runscript(dirname):
                 log('Aborting experiment {}'.format(dirname))
                 os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                 raise Exception("Abort experiment")
-            log_f.write(line)
+            log_fp.write(line)
             log_fp.flush()
         log('process is dead, stdout is closed')
     log("Finished running experiment {}".format(dirname))
