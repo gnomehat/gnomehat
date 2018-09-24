@@ -149,8 +149,10 @@ def delete_job():
 def stop_job():
     print("Stop job: {}".format(flask.request.get_json()))
     job_id = flask.request.get_json()['id']
+    filename = os.path.join(config['EXPERIMENTS_DIR'], job_id, 'worker_abort')
+    with open(filename, 'w') as fp:
+        fp.write('OK')
     filename = os.path.join(config['EXPERIMENTS_DIR'], job_id, 'worker_finished')
-    print('Writing {}'.format(filename))
     with open(filename, 'w') as fp:
         fp.write('OK')
     return 'OK'

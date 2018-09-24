@@ -8,6 +8,7 @@ import fcntl
 import subprocess
 from socket import gethostname
 import requests
+import signal
 from gnomehat import sysinfo
 
 import logging
@@ -71,8 +72,9 @@ def gpu_is_in_use(gpu_id):
 
 def run_experiments(experiments_dir):
     log('Worker waking up...')
-    if gpu_is_in_use(get_gpu()):
-        log('GPU {} is being used, going back to sleep'.format(get_gpu()))
+    gpu_idx = get_gpu()
+    if gpu_is_in_use(gpu_idx):
+        log('GPU {} is being used, going back to sleep'.format(gpu_idx))
         return
     experiments = os.listdir(experiments_dir)
     for name in experiments:
@@ -114,26 +116,8 @@ def run_experiment(dirname):
         with open('worker_started', 'w') as fp:
             fp.write(getinfo())
 
-        # Run the experiment
-        with open('stdout.txt', 'a') as log_fp:
-            timestamp = subprocess.check_output('date').decode('utf-8').strip()
-            log('Writing to the logfile...')
-            log_fp.write('[Worker starting experiment at {}]\n'.format(timestamp))
-            log('calling subprocess.Popen')
-            proc = subprocess.Popen('./gnomehat_start.sh',
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT,
-                                    bufsize=1,
-                                    universal_newlines=True)
-            log('reading from subprocess...()')
-            for line in iter(proc.stdout.readline, ''):
-                log_fp.write(line)
-                log_fp.flush()
-            log('process is dead, stdout is closed')
+        execute_runscript(dirname)
 
-        log("Finished running experiment {}".format(dirname))
-
-        # Then write worker_finished
         with open('worker_finished', 'w') as fp:
             fp.write('{}'.format(getinfo()))
             chat_notification('Finished job {}'.format(dirname))
@@ -148,6 +132,32 @@ def run_experiment(dirname):
         if os.path.exists(lockfile_name):
             os.remove(lockfile_name)
     log('Finished cleaning up experiment {}'.format(dirname))
+
+
+def execute_runscript(dirname):
+    # Run the experiment
+    with open('stdout.txt', 'a') as log_fp:
+        timestamp = subprocess.check_output('date').decode('utf-8').strip()
+        log('Writing to the logfile...')
+        log_fp.write('[Worker starting experiment at {}]\n'.format(timestamp))
+        log('calling subprocess.Popen')
+        proc = subprocess.Popen('./gnomehat_start.sh',
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT,
+                                bufsize=1,
+                                universal_newlines=True,
+                                preexec_fn=os.setsid)
+        log('reading from subprocess...()')
+        for line in iter(proc.stdout.readline, ''):
+            if os.path.exists('worker_abort'):
+                log('Aborting experiment {}'.format(dirname))
+                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                raise Exception("Abort experiment")
+            log_f.write(line)
+            log_fp.flush()
+        log('process is dead, stdout is closed')
+    log("Finished running experiment {}".format(dirname))
 
 
 def main(experiments_dir):
