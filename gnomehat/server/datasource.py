@@ -35,6 +35,9 @@ def get_results(files_url):
         full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
 
         dir_contents = get_dir_contents(full_path)
+        is_experiment = 'gnomehat_start.sh' in dir_contents
+        if not is_experiment:
+            continue
 
         image_url = default_image_url()
         last_modified_timestamp = started_at
@@ -60,8 +63,6 @@ def get_results(files_url):
             color = 'reddish'
         elif not started_job and not running_job:
             color = 'greenish'
-
-        is_experiment = 'gnomehat_start.sh' in dir_contents
 
         experiment_name = experiment_id[:-8]
         experiment_name = experiment_name.replace('_', ' ').replace('-', ' ').strip()
@@ -103,7 +104,6 @@ def get_results(files_url):
             'is_experiment': is_experiment,
             'metrics_summary': metrics_summary,
         }
-
         results.append(result)
     return sorted(results, key=lambda x: x['last_modified_timestamp'], reverse=True)
 
