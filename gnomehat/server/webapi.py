@@ -222,7 +222,7 @@ def experiment_tensorboard(experiment_id):
     tensorboard_url = 'http://{}:{}'.format(tensorboard_host(), tensorboard_port)
 
     # HACK: Wait for tensorboard to load. TODO preload it
-    time.sleep(1)
+    time.sleep(3)
 
     return flask.redirect(tensorboard_url)
 
