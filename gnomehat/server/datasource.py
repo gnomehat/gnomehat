@@ -19,93 +19,118 @@ from gnomehat.server import app, config
 TIMEZONE = 'US/Pacific'
 
 
-def get_results(files_url):
+def get_results(files_url, namespace=None):
+    experiments_dir = get_experiments_dir(namespace)
+    result_dirs = get_result_dirs(experiments_dir)
+
     results = []
-    result_dirs = [os.path.join(config['EXPERIMENTS_DIR'], r) for r in os.listdir(config['EXPERIMENTS_DIR'])]
-    result_dirs = [r for r in result_dirs if os.path.isdir(r)]
-    result_dirs.sort(key=os.path.getmtime)
-    result_dirs = result_dirs[-config['MAX_RESULTS']:]
-
     for dir_path in result_dirs:
-        experiment_id = dir_path.split('/')[-1]
-        timestamp = int(os.path.getmtime(dir_path))
-
-        started_at = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.timezone(TIMEZONE))
-
-        full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
-
-        dir_contents = get_dir_contents(full_path)
-        is_experiment = 'gnomehat_start.sh' in dir_contents
-        if not is_experiment:
-            continue
-
-        image_url = default_image_url()
-        last_modified_timestamp = started_at
-        jpgs = [filename for filename in dir_contents if has_image_extension(filename)]
-        if jpgs:
-            def last_modified(x):
-                try:
-                    return os.path.getmtime(os.path.join(full_path,x))
-                except:
-                    return 0
-            jpgs.sort(key=last_modified)
-            last_modified_timestamp = last_modified(jpgs[-1])
-            image_url = '{}/{}/{}'.format(files_url, experiment_id, jpgs[-1])
-
-        running_job = os.path.exists(os.path.join(full_path, 'worker_lockfile'))
-        finished_job = os.path.exists(os.path.join(full_path, 'worker_finished'))
-        started_job = os.path.exists(os.path.join(full_path, 'worker_started'))
-        broken_job = os.path.exists(os.path.join(full_path, 'worker_error'))
-        color = 'orangeish'
-        if finished_job:
-            color = 'blueish'
-        elif broken_job and not running_job:
-            color = 'reddish'
-        elif not started_job and not running_job:
-            color = 'greenish'
-
-        experiment_name = experiment_id[:-8]
-        experiment_name = experiment_name.replace('_', ' ').replace('-', ' ').strip()
-        experiment_name = experiment_name.title()
-
-        headline = ""
-        if is_experiment:
-            headline = get_command(full_path)
-
-        notes = get_notes(experiment_id)
-        if notes:
-            subtitle = notes
-        else:
-            subtitle = stdout_last_n_lines(experiment_id, n=1)
-
-        metrics_summary = {}
-        metrics_summary_filename = os.path.join(dir_path, '.last_summary.json')
-        if os.path.exists(metrics_summary_filename):
-            metrics_summary = json.loads(open(metrics_summary_filename).read())
-
-        if len(headline) > 128:
-            headline = headline[:128] + '...'
-        if len(subtitle) > 128:
-            subtitle = subtitle[:128] + '...'
-
-        result = {
-            'experiment_name': experiment_name,
-            'headline': headline,
-            'subtitle': subtitle,
-            'dir_name': experiment_id,
-            'name': experiment_id.replace('_', ' '),
-            'start_timestamp': timestamp,
-            'last_modified_timestamp': timestamp,
-            'started_at': started_at.strftime('%a %I:%M%p'),
-            'finished': finished_job,
-            'color': color,
-            'image_url': image_url,
-            'last_log_summary': get_log_summary(experiment_id),
-            'is_experiment': is_experiment,
-            'metrics_summary': metrics_summary,
-        }
-        results.append(result)
+        experiment = experiment_from_filesystem(dir_path, files_url)
+        if experiment is not None:
+            results.append(experiment)
     return sorted(results, key=lambda x: x['last_modified_timestamp'], reverse=True)
+
+
+# The experiments_dir contains subdirectories, each of which is a shallow clone
+def get_experiments_dir(namespace=None):
+    if namespace is None:
+        return config['EXPERIMENTS_DIR']
+    return os.path.join(config['EXPERIMENTS_DIR'], namespace)
+
+
+def get_result_dirs(experiments_dir):
+    # List all subdirectories
+    result_dirs = [os.path.join(experiments_dir, r)
+                   for r in os.listdir(experiments_dir)]
+    result_dirs = [r for r in result_dirs if os.path.isdir(r)]
+
+    # Return the most recent N results
+    result_dirs.sort(key=os.path.getmtime)
+    max_results = config['MAX_RESULTS']
+    result_dirs = result_dirs[-max_results:]
+    return result_dirs
+
+
+def experiment_from_filesystem(dir_path, files_url):
+
+    # TODO: parse this in a non-fragile way
+    assert dir_path.startswith(config['EXPERIMENTS_DIR'])
+    chop = len(config['EXPERIMENTS_DIR']) + 1
+    experiment_id = dir_path[chop:]
+
+    timestamp = int(os.path.getmtime(dir_path))
+
+    started_at = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.timezone(TIMEZONE))
+    full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+    dir_contents = get_dir_contents(full_path)
+    if 'gnomehat_start.sh' not in dir_contents:
+        return None
+
+    image_url = default_image_url()
+    last_modified_timestamp = started_at
+    jpgs = [filename for filename in dir_contents if has_image_extension(filename)]
+    if jpgs:
+        def last_modified(x):
+            try:
+                return os.path.getmtime(os.path.join(full_path,x))
+            except:
+                return 0
+        jpgs.sort(key=last_modified)
+        last_modified_timestamp = last_modified(jpgs[-1])
+        image_url = '{}/{}/{}'.format(files_url, experiment_id, jpgs[-1])
+
+    running_job = os.path.exists(os.path.join(full_path, 'worker_lockfile'))
+    finished_job = os.path.exists(os.path.join(full_path, 'worker_finished'))
+    started_job = os.path.exists(os.path.join(full_path, 'worker_started'))
+    broken_job = os.path.exists(os.path.join(full_path, 'worker_error'))
+    color = 'orangeish'
+    if finished_job:
+        color = 'blueish'
+    elif broken_job and not running_job:
+        color = 'reddish'
+    elif not started_job and not running_job:
+        color = 'greenish'
+
+    experiment_name = experiment_id[:-8]
+    experiment_name = experiment_name.replace('_', ' ').replace('-', ' ').strip()
+    experiment_name = experiment_name.title()
+
+    headline = ""
+    headline = get_command(full_path)
+
+    notes = get_notes(experiment_id)
+    if notes:
+        subtitle = notes
+    else:
+        subtitle = stdout_last_n_lines(experiment_id, n=1)
+
+    metrics_summary = {}
+    metrics_summary_filename = os.path.join(dir_path, '.last_summary.json')
+    if os.path.exists(metrics_summary_filename):
+        metrics_summary = json.loads(open(metrics_summary_filename).read())
+
+    if len(headline) > 128:
+        headline = headline[:128] + '...'
+    if len(subtitle) > 128:
+        subtitle = subtitle[:128] + '...'
+
+    result = {
+        'experiment_name': experiment_name,
+        'headline': headline,
+        'subtitle': subtitle,
+        'dir_name': experiment_id,
+        'name': experiment_id.replace('_', ' '),
+        'start_timestamp': timestamp,
+        'last_modified_timestamp': timestamp,
+        'started_at': started_at.strftime('%a %I:%M%p'),
+        'finished': finished_job,
+        'color': color,
+        'image_url': image_url,
+        'last_log_summary': get_log_summary(experiment_id),
+        'metrics_summary': metrics_summary,
+    }
+    return result
+
 
 
 def get_worker_count():

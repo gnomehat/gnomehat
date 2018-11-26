@@ -38,6 +38,26 @@ def front_page():
     return flask.render_template('index.html', **kwargs)
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return flask.send_from_directory(config['EXPERIMENTS_DIR'], 'favicon.ico')
+
+
+@app.route('/<namespace>')
+def front_page_namespace(namespace):
+    start_time = time.time()
+    files_url = get_files_url()
+    kwargs = {
+        'results': get_results(files_url, namespace),
+        'files_url': files_url,
+        'worker_count': get_worker_count(),
+        'server_title': datasource.get_server_title(),
+    }
+    print("Generated results for front page in {:.2f} sec".format(
+        time.time() - start_time))
+    return flask.render_template('index.html', **kwargs)
+
+
 @app.route('/metrics')
 def view_metrics():
     metrics = get_all_experiment_metrics(config['EXPERIMENTS_DIR'])
