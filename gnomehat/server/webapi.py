@@ -184,12 +184,12 @@ def get_info():
     return json.dumps(info, indent=2)
 
 
-@app.route('/experiment/<experiment_id>')
+@app.route('/experiment/<path:experiment_id>')
 def view_experiment(experiment_id):
     dir_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+    print('dir_path {}'.format(dir_path))
     image_groups = []
 
-    print('get_images output for {}:\n{}'.format(experiment_id, get_images(experiment_id)))
     for name, images in get_images(experiment_id):
         url_latest_n = []
         for image in sorted(images)[-5:]:
@@ -221,9 +221,9 @@ def view_experiment(experiment_id):
     return flask.render_template('experiment.html', **kwargs)
 
 
-@app.route('/experiment/<experiment_id>/files')
-def view_experiment_listing(experiment_id):
-    full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+@app.route('/experiment/<experiment_namespace>/<experiment_id>/files')
+def view_experiment_listing(experiment_namespace, experiment_id):
+    full_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_namespace, experiment_id)
     listing = get_directory_listing(full_path)
     kwargs = {
         'listing': listing,
@@ -234,10 +234,10 @@ def view_experiment_listing(experiment_id):
     return flask.render_template('experiment_listing.html', **kwargs)
 
 
-@app.route('/experiment/<experiment_id>/tensorboard')
-def experiment_tensorboard(experiment_id):
+@app.route('/experiment/<experiment_namespace>/<experiment_id>/tensorboard')
+def experiment_tensorboard(experiment_namespace, experiment_id):
     # Spawn a Tensorboard server
-    tb_log_dir = os.path.join(config['EXPERIMENTS_DIR'], experiment_id, 'runs')
+    tb_log_dir = os.path.join(config['EXPERIMENTS_DIR'], experiment_namespace, experiment_id, 'runs')
     tensorboard_port = spawn_tensorboard(tb_log_dir)
     tensorboard_url = 'http://{}:{}'.format(tensorboard_host(), tensorboard_port)
 
@@ -247,11 +247,11 @@ def experiment_tensorboard(experiment_id):
     return flask.redirect(tensorboard_url)
 
 
-@app.route('/experiment/<experiment_id>/visdom')
-def experiment_visdom(experiment_id):
+@app.route('/experiment/<experiment_namespace>/<experiment_id>/visdom')
+def experiment_visdom(experiment_namespace, experiment_id):
     # Spawn a Visdom server, just an empty test page for now
     # TODO: Include a default visdom.py that just prints all images
-    visdom_dir = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+    visdom_dir = os.path.join(config['EXPERIMENTS_DIR'], experiment_namespace, experiment_id)
     visdom_host = tensorboard_host()
     visdom_port = spawn_visdom(visdom_dir)
     visdom_url = 'http://{}:{}'.format(visdom_host, visdom_port)
