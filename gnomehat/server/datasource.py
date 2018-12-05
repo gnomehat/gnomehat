@@ -52,7 +52,6 @@ def get_result_dirs(experiments_dir):
 
 
 def experiment_from_filesystem(dir_path, files_url):
-
     # TODO: parse this in a non-fragile way
     assert dir_path.startswith(config['EXPERIMENTS_DIR'])
     chop = len(config['EXPERIMENTS_DIR']) + 1

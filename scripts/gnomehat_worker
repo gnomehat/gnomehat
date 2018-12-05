@@ -18,7 +18,7 @@ CHAT_URL = os.environ.get('GNOMEHAT_CHAT_URL')
 
 def log(*args):
     print(*args)
-    logger.info(*args)
+    #logger.info(*args)
 
 
 def configure_logger(experiments_dir):
@@ -72,7 +72,7 @@ def gpu_is_in_use(gpu_id):
 
 
 def run_experiments(experiments_dir):
-    log('Worker waking up...')
+    #log('Worker waking up...')
     gpu_idx = get_gpu()
     if gpu_is_in_use(gpu_idx):
         log('GPU {} is being used, going back to sleep'.format(gpu_idx))
@@ -95,10 +95,10 @@ def run_experiments(experiments_dir):
         # And did not fail due to an error
         if 'worker_error' in files:
             continue
-        chat_notification('Starting job {}'.format(dirname))
+        log('Starting job {}'.format(dirname))
         run_experiment(dirname)
         break
-    log('Worker sleeping...')
+    #log('Worker sleeping...')
 
 
 def run_experiment(dirname):
@@ -164,7 +164,7 @@ def execute_runscript(dirname):
 def main(experiments_dir):
     configure_logger(experiments_dir)
     gpu = get_gpu()
-    chat_notification('Worker starting with GPU {} in {}'.format(gpu, experiments_dir))
+    log('Worker starting with GPU {} in {}'.format(gpu, experiments_dir))
     os.chdir(experiments_dir)
     while True:
         log('Worker looking for jobs...')
