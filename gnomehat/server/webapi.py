@@ -59,8 +59,15 @@ def front_page_namespace(namespace):
 
 
 @app.route('/metrics')
-def view_metrics():
-    metrics = get_all_experiment_metrics(config['EXPERIMENTS_DIR'])
+def list_metrics(namespace):
+    #namespaces = get_namespaces()
+    return 'TODO: list experiment namespace'
+
+
+@app.route('/metrics/<namespace>')
+def view_metrics(namespace):
+    dir_name = os.path.join(config['EXPERIMENTS_DIR'], namespace)
+    metrics = get_all_experiment_metrics(dir_name)
     all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
     all_keys.remove('notes')
     all_keys = list(sorted(all_keys))
