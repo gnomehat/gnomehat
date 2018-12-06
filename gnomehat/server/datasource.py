@@ -189,9 +189,7 @@ def get_log_summary(dir_name):
     return last_log_summary
 
 
-def get_images(experiment_id):
-    experiments_dir = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
-
+def get_images(experiments_dir):
     files = get_dir_images(experiments_dir)
 
     # Group the files based on name before the timestamp

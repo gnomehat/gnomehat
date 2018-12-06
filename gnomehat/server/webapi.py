@@ -191,10 +191,10 @@ def view_experiment(experiment_namespace, experiment_id):
     print('dir_path {}'.format(dir_path))
     image_groups = []
 
-    for name, images in get_images(experiment_id):
+    for name, images in get_images(dir_path):
         url_latest_n = []
         for image in sorted(images)[-5:]:
-            url = '{}/{}/{}'.format(files_url, experiment_id, image)
+            url = '/'.join([files_url, experiment_namespace, experiment_id, image])
             url_latest_n.append(url)
 
         image_groups.append({
@@ -212,6 +212,7 @@ def view_experiment(experiment_namespace, experiment_id):
 
     kwargs = {
         'experiment_id': experiment_id,
+        'experiment_namespace': experiment_namespace,
         'files_url': files_url,
         'image_groups': image_groups,
         'websocket_host': websocket_host(),
@@ -229,6 +230,7 @@ def view_experiment_listing(experiment_namespace, experiment_id):
     kwargs = {
         'listing': listing,
         'cwd': experiment_id,
+        'experiment_namespace': experiment_namespace,
         'experiment_id': experiment_id,
         'files_url': get_files_url(experiment_namespace),
     }
