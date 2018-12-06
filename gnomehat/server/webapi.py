@@ -184,16 +184,17 @@ def get_info():
     return json.dumps(info, indent=2)
 
 
-@app.route('/experiment/<path:experiment_id>')
-def view_experiment(experiment_id):
-    dir_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+@app.route('/experiment/<experiment_namespace>/<experiment_id>')
+def view_experiment(experiment_namespace, experiment_id):
+    dir_path = os.path.join(config['EXPERIMENTS_DIR'], experiment_namespace, experiment_id)
+    files_url = get_files_url(experiment_namespace)
     print('dir_path {}'.format(dir_path))
     image_groups = []
 
     for name, images in get_images(experiment_id):
         url_latest_n = []
         for image in sorted(images)[-5:]:
-            url = '{}/{}/{}'.format(get_files_url(), experiment_id, image)
+            url = '{}/{}/{}'.format(files_url, experiment_id, image)
             url_latest_n.append(url)
 
         image_groups.append({
@@ -211,7 +212,7 @@ def view_experiment(experiment_id):
 
     kwargs = {
         'experiment_id': experiment_id,
-        'files_url': get_files_url(),
+        'files_url': files_url,
         'image_groups': image_groups,
         'websocket_host': websocket_host(),
         'websocket_port': console_port,
@@ -229,7 +230,7 @@ def view_experiment_listing(experiment_namespace, experiment_id):
         'listing': listing,
         'cwd': experiment_id,
         'experiment_id': experiment_id,
-        'files_url': get_files_url(),
+        'files_url': get_files_url(experiment_namespace),
     }
     return flask.render_template('experiment_listing.html', **kwargs)
 
@@ -307,9 +308,10 @@ def spawn_visdom(experiment_dir):
     return portnum
 
 
-def get_files_url():
+def get_files_url(namespace=None):
+    if namespace:
+        return os.path.join(flask.request.url_root, 'experiments', namespace)
     return os.path.join(flask.request.url_root, 'experiments')
-
 
 
 def websocket_host():
