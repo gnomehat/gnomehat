@@ -19,6 +19,27 @@ from gnomehat.server import app, config
 TIMEZONE = 'US/Pacific'
 
 
+def get_namespaces(url_prefix):
+    namespaces = []
+    for namespace in os.listdir(config['EXPERIMENTS_DIR']):
+        path = os.path.join(config['EXPERIMENTS_DIR'], namespace)
+        if not os.path.isdir(path):
+            continue
+        namespaces.append({
+            'name': namespace,
+            'url': os.path.join(url_prefix, namespace),
+            'count': len(ls_directories(path)),
+            'last_modified': timestamp_to_str(os.stat(path).st_mtime),
+        })
+    return namespaces
+
+
+def ls_directories(path):
+    return [os.path.join(path, name)
+            for name in os.listdir(path)
+            if os.path.isdir(os.path.join(path, name))]
+
+
 def get_results(files_url, namespace=None):
     experiments_dir = get_experiments_dir(namespace)
     result_dirs = get_result_dirs(experiments_dir)

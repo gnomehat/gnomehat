@@ -18,7 +18,7 @@ from gnomehat import sysinfo, hostinfo
 from gnomehat.server import app, config
 
 from gnomehat.server import datasource
-from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics, get_directory_listing, get_worker_count
+from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics, get_directory_listing, get_worker_count, get_namespaces
 
 # TODO: Rest of world
 TIMEZONE = 'US/Pacific'
@@ -59,9 +59,10 @@ def front_page_namespace(namespace):
 
 
 @app.route('/metrics')
-def list_metrics(namespace):
-    #namespaces = get_namespaces()
-    return 'TODO: list experiment namespace'
+def list_metrics():
+    url_root = os.path.join(flask.request.url_root, 'metrics')
+    namespaces = get_namespaces(url_root)
+    return flask.render_template('metrics_listing.html', namespaces=namespaces)
 
 
 @app.route('/metrics/<namespace>')

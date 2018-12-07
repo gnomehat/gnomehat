@@ -1,0 +1,22 @@
+<script src="/static/js/sorttable.js"></script>
+<h4>Projects</h4>
+<table class="sortable">
+  <tr>
+    <th>Name</th>
+    <th>Count</th>
+    <th>Last Modified</th>
+  </tr>
+  {% for item in namespaces: %}
+  <tr>
+    <td>
+      <a href="{{item['url']}}">{{item['name']}}</a>
+    </td>
+    <td>
+      {{item['count']}}
+    </td>
+    <td>
+      {{item['last_modified']}}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
