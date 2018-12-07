@@ -10,9 +10,21 @@ import os
 import subprocess
 import shutil
 import requests
+import argparse
 
 from gnomehat import hostinfo
 
+USAGE = '''
+gnomehat_run: Run a shell command as a Gnomehat experiment
+
+Usage:
+    gnomehat_run [-m "message"] [-n namespace] <command ...>
+
+Examples:
+    gnomehat python main.py
+    gnomehat python my_experiment_with_args.py --arg1 foo --arg2 bar
+    gnomehat -m "Add frob layers" python main.py --frob=True
+'''
 
 def mkdirp(path):
     os.makedirs(path, exist_ok=True)
@@ -68,20 +80,32 @@ def chmodx(filename):
     os.chmod(filename, st.st_mode | stat.S_IEXEC)
 
 
+# TODO: We don't want the default behavior of eg. argparse because of usage like:
+#  gnomehat -m "my experiment" python train.py --arg1 --arg2
+# We want to parse left-to-right UNTIL we hit something that looks like a command
 def parse_args():
+    # Surely no one will ever want to run a --help command inside a worker process
     if '--help' in sys.argv or len(sys.argv) < 2:
-        print('Usage:\n\tgnomehat_run <my_experiment.py> [--my-args ...]')
-        exit(1)
+        raise ValueError
 
-    options = {}
-    if sys.argv[1] == '-m':
-        options['notes'] = sys.argv[2]
-        options['executable'] = sys.argv[3]
-        options['args'] = sys.argv[4:]
-    else:
-        options['notes'] = ''
-        options['executable'] = sys.argv[1]
-        options['args'] = sys.argv[2:]
+    options = {
+        'notes': '',
+        'namespace': 'default',
+    }
+    i = 1
+    while True:
+        if sys.argv[i] in ['-m', '--message']:
+            options['notes'] = sys.argv[i+1]
+            i += 2
+        elif sys.argv[i] in ['-n', '--namespace']:
+            options['namespace'] = sys.argv[i+1]
+            i += 2
+        else:
+            if i >= len(sys.argv):
+                raise ValueError
+            options['executable'] = sys.argv[i]
+            options['args'] = sys.argv[i+1:]
+            break
 
     if options['executable'] == 'python':
         print('Executing Python script with args: {}'.format(options['args']))
@@ -100,17 +124,30 @@ def get_experiments_dir():
 
 
 if __name__ == '__main__':
-    options = parse_args()
+    # Parse args, print usage and quit on error
+    try:
+        options = parse_args()
+    except ValueError:
+        print(USAGE)
+        exit(1)
 
-    # First, ensure that Gnomehat is running
-    experiments_dir = get_experiments_dir()
+    # Ensure that Gnomehat is running
+    try:
+        experiments_dir = get_experiments_dir()
+    except requests.exceptions.ConnectionError:
+        print('Could not connect to server: is gnomehat_server running?')
+        exit(1)
+
     if experiments_dir is None:
         experiments_dir = input('Input an experiments directory:\n> ')
     print('Using experiments_dir {}'.format(experiments_dir))
 
+    namespace_dir = os.path.join(experiments_dir, options['namespace'])
+    mkdirp(namespace_dir)
+
     # Create a copy of this experiment in target_dir
-    experiment_name = make_experiment_name(experiments_dir)
-    target_dir = make_target_dir(experiments_dir, experiment_name)
+    experiment_name = make_experiment_name(namespace_dir)
+    target_dir = make_target_dir(namespace_dir, experiment_name)
     copy_repo(target_dir)
 
     # Write a .sh script containing the user-supplied command to be run
@@ -128,5 +165,5 @@ if __name__ == '__main__':
         print("\nSee results at:")
         print("\t{}/experiment/{}\n".format(gui_url, experiment_name))
     else:
-        print("Error: Cannot read {}/hostinfo.json, please restart server".format(experiments_dir))
+        print("Error: Cannot read {}/hostinfo.json, please restart server".format(namespace_dir))
 

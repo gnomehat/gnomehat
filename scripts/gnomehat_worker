@@ -168,8 +168,11 @@ def main(experiments_dir):
     os.chdir(experiments_dir)
     while True:
         log('Worker looking for jobs...')
-        run_experiments(experiments_dir)
-        time.sleep(5)
+        for namespace in os.listdir(experiments_dir):
+            namespace_dir = os.path.join(experiments_dir, namespace)
+            if os.path.isdir(namespace_dir):
+                run_experiments(namespace_dir)
+        time.sleep(2)
 
 
 if __name__ == '__main__':
