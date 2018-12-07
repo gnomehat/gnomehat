@@ -70,13 +70,14 @@ def view_metrics(namespace):
     dir_name = os.path.join(config['EXPERIMENTS_DIR'], namespace)
     metrics = get_all_experiment_metrics(dir_name)
     all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
-    all_keys.remove('notes')
+    if 'notes' in all_keys:
+        all_keys.remove('notes')
     all_keys = list(sorted(all_keys))
     all_keys.append('notes')
 
     kwargs = {
         'metrics': metrics,
-        'keys': all_keys
+        'keys': all_keys,
     }
     return flask.render_template('metrics.html', **kwargs)
 
