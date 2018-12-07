@@ -162,7 +162,7 @@ def execute_runscript(dirname):
 
 
 def main(experiments_dir):
-    configure_logger(experiments_dir)
+    #configure_logger(experiments_dir)
     gpu = get_gpu()
     log('Worker starting with GPU {} in {}'.format(gpu, experiments_dir))
     os.chdir(experiments_dir)
