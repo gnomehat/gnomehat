@@ -26,16 +26,18 @@ TIMEZONE = 'US/Pacific'
 
 @app.route('/')
 def front_page():
-    start_time = time.time()
+    namespaces = get_namespaces(flask.request.url_root)
+
+    # TODO: if there is only one namespace, redirect to it
+
     kwargs = {
         'results': get_results(get_files_url()),
+        'namespaces': namespaces,
         'files_url': get_files_url(),
         'worker_count': get_worker_count(),
         'server_title': datasource.get_server_title(),
     }
-    print("Generated results for front page in {:.2f} sec".format(
-        time.time() - start_time))
-    return flask.render_template('index.html', **kwargs)
+    return flask.render_template('list_namespaces.html', namespaces=namespaces)
 
 
 @app.route('/favicon.ico')
