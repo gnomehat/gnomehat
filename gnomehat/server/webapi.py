@@ -45,6 +45,7 @@ def favicon():
     return flask.send_from_directory(config['EXPERIMENTS_DIR'], 'favicon.ico')
 
 
+# TODO: Surely no one will ever create a namespace named 'metrics' or 'experiment'
 @app.route('/<namespace>')
 def front_page_namespace(namespace):
     start_time = time.time()
