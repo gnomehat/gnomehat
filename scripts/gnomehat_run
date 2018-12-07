@@ -114,13 +114,12 @@ def parse_args():
     return options
 
 
-def get_experiments_dir():
-    # HACK: Assume we're running on the same machine as the server
-    # HACK: Assume port 8086
-    # TODO: Configure this, but which way is best?
-    url = 'http://localhost:8086/info'
-    info = requests.get(url).json()
-    return info['experiments_dir']
+def get_user_settings():
+    dotfile = os.path.expanduser('~/.gnomehat')
+    if os.path.exists(dotfile):
+        info = json.load(open(dotfile))
+        return info
+    return {}
 
 
 if __name__ == '__main__':
@@ -131,18 +130,12 @@ if __name__ == '__main__':
         print(USAGE)
         exit(1)
 
-    # Ensure that Gnomehat is running
-    try:
-        experiments_dir = get_experiments_dir()
-    except requests.exceptions.ConnectionError:
-        print('Could not connect to server: is gnomehat_server running?')
-        exit(1)
-
+    # Check the experiments directory
+    experiments_dir = get_user_settings().get('experiments_dir')
     if experiments_dir is None:
         experiments_dir = input('Input an experiments directory:\n> ')
-    print('Using experiments_dir {}'.format(experiments_dir))
-
     namespace_dir = os.path.join(experiments_dir, options['namespace'])
+    print('Adding experiment to {}'.format(namespace_dir))
     mkdirp(namespace_dir)
 
     # Create a copy of this experiment in target_dir
