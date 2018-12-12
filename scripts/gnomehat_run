@@ -11,6 +11,7 @@ import subprocess
 import shutil
 import requests
 import argparse
+import json
 
 from gnomehat import hostinfo
 
