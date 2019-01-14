@@ -26,18 +26,7 @@ TIMEZONE = 'US/Pacific'
 
 @app.route('/')
 def front_page():
-    namespaces = get_namespaces(flask.request.url_root)
-
-    # TODO: if there is only one namespace, redirect to it
-
-    kwargs = {
-        'results': get_results(get_files_url()),
-        'namespaces': namespaces,
-        'files_url': get_files_url(),
-        'worker_count': get_worker_count(),
-        'server_title': datasource.get_server_title(),
-    }
-    return flask.render_template('list_namespaces.html', namespaces=namespaces)
+    return flask.redirect('/default')
 
 
 @app.route('/favicon.ico')
@@ -50,11 +39,15 @@ def favicon():
 def front_page_namespace(namespace):
     start_time = time.time()
     files_url = get_files_url()
+    selectable_namespaces = get_namespaces(flask.request.url_root)
+    for ns in selectable_namespaces:
+        ns['selected'] = 'selected' if ns['name'].lower() == namespace.lower() else ''
     kwargs = {
         'results': get_results(files_url, namespace),
         'files_url': files_url,
         'worker_count': get_worker_count(),
         'server_title': datasource.get_server_title(),
+        'namespaces': selectable_namespaces,
     }
     print("Generated results for front page in {:.2f} sec".format(
         time.time() - start_time))
