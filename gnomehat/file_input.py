@@ -55,5 +55,11 @@ def read_directory_name(prompt="Enter a directory: "):
     readline.parse_and_bind("tab: complete")
 
     readline.set_completer(t.pathCompleter)
-    ans = input(prompt)
-    return ans
+    path = input(prompt)
+
+    # If user-specified directory is invalid, retry
+    if os.access(os.path.dirname(path), os.W_OK):
+        return path
+    else:
+        print('Error: path "{}" is not a valid, writable directory'.format(path))
+        return read_directory_name(prompt)
