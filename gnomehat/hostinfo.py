@@ -3,6 +3,7 @@ import os
 import json
 import socket
 import requests
+from gnomehat.local_ip import get_local_ip
 
 
 def init_hostinfo(config):
@@ -14,7 +15,7 @@ def init_hostinfo(config):
     if os.environ.get('GNOMEHAT_SERVER_URL'):
         hostname = os.environ.get('GNOMEHAT_SERVER_URL')
     else:
-        hostname = socket.gethostname()
+        hostname = get_local_ip()
 
     info = {
         'hostname': hostname,
