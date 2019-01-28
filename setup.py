@@ -6,6 +6,8 @@ import os
 import requests
 import subprocess
 
+# TODO: Integrate websocketd in a cleaner way, or replace it
+# For now, install it to the current user's ~/bin
 WEBSOCKETD_URL = 'https://github.com/joewalnes/websocketd/releases/download/v0.3.0/websocketd-0.3.0-linux_amd64.zip'
 WEBSOCKETD_FILENAME = 'websocketd-0.3.0-linux_amd64.zip'
 WEBSOCKETD_CHECKSUM = '03b8d90b4ac1f58469965c133cf3dd9c43dc0811e525b2319df578e7057db5b4'
