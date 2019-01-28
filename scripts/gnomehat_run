@@ -120,7 +120,7 @@ def parse_args():
             options['args'] = sys.argv[i+1:]
             break
 
-    if options['executable'] == 'python':
+    if options['executable'] in ['python', 'python3']:
         print('Executing Python script with args: {}'.format(options['args']))
         # TODO: run pyflakes maybe?
 
