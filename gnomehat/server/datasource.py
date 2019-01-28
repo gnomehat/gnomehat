@@ -17,12 +17,19 @@ from gnomehat.server import app, config
 
 # TODO: Rest of world
 TIMEZONE = 'US/Pacific'
+DEFAULT_NAMESPACE = 'default'
 
 
+# Every experiment is a directory within a namespace
+# Each namespace is a top-level directory within EXPERIMENTS_DIR
 def get_namespaces(url_prefix):
+    ensure_default_namespace()
+
     namespaces = []
     for namespace in os.listdir(config['EXPERIMENTS_DIR']):
         path = os.path.join(config['EXPERIMENTS_DIR'], namespace)
+        if path.startswith('.'):
+            continue
         if not os.path.isdir(path):
             continue
         namespaces.append({
@@ -32,6 +39,13 @@ def get_namespaces(url_prefix):
             'last_modified': timestamp_to_str(os.stat(path).st_mtime),
         })
     return namespaces
+
+
+# At least one namespace (the default namespace) must always exist
+def ensure_default_namespace():
+    default_namespace_path = os.path.join(config['EXPERIMENTS_DIR'], DEFAULT_NAMESPACE)
+    if not os.path.exists(default_namespace_path):
+        os.mkdir(default_namespace_path)
 
 
 def ls_directories(path):
