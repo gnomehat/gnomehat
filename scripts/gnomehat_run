@@ -42,6 +42,7 @@ def make_target_dir(experiments_dir, experiment_name):
 
 
 def copy_repo(target_dir):
+    print('Copying current working repository to {}'.format(target_dir))
     # Check that this is a git repository
     try:
         subprocess.check_output(['git', 'describe', '--always'])
@@ -54,11 +55,21 @@ def copy_repo(target_dir):
         print('    git commit')
         exit(1)
 
-    # Get the list of tracked filenames in the current repo
+    # Shallow-clone the cwd repository to target_dir
+    # This preserves branch name and commit hash, but skips history
+    # Note: git-clone is finnicky and requires us to chdir to the target
+    source_dir = os.getcwd()
+    mkdirp(target_dir)
+    os.chdir(target_dir)
+    clone_cmd = ['git', 'clone', '--depth=1', 'file://{}'.format(source_dir), '.']
+    subprocess.check_output(clone_cmd)
+    os.chdir(source_dir)
+
+    # Get all potential untracked files in the current repo
     stdout = subprocess.check_output(['git', 'ls-files'])
     filenames = str(stdout, 'utf-8').splitlines()
 
-    # Copy those files to target_dir
+    # Copy all untracked changes into target_dir
     for src_filename in filenames:
         dst_filename = os.path.join(target_dir, src_filename)
         mkdirp(os.path.dirname(dst_filename))
@@ -146,7 +157,8 @@ if __name__ == '__main__':
 
     # Create a copy of this experiment in target_dir
     experiment_name = make_experiment_name(namespace_dir)
-    target_dir = make_target_dir(namespace_dir, experiment_name)
+    print('Creating target directory {}'.format(experiment_name))
+    target_dir = os.path.join(namespace_dir, experiment_name)
     copy_repo(target_dir)
 
     # Write a .sh script containing the user-supplied command to be run
@@ -167,7 +179,7 @@ if __name__ == '__main__':
     gui_url = hostinfo.get_hostinfo(experiments_dir).get('gui_url')
     if gui_url:
         print("\nSee results at:")
-        print("\t{}/experiment/{}\n".format(gui_url, experiment_name))
+        print("\t{}/experiment/{}/{}\n".format(gui_url, options['namespace'], experiment_name))
     else:
         print("Error: Cannot read {}/hostinfo.json, please restart server".format(namespace_dir))
 

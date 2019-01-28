@@ -124,6 +124,7 @@ def gnomehat_demo(experiments_dir, demo_name):
     TMP_DIR = '/tmp'
     os.chdir(TMP_DIR)
 
+    # TODO: Set up dedicated org for demo zoo
     DEMOS_GIT_URL = 'https://github.com/lwneal/'
     clone_cmd = ['git', 'clone', '{}/{}'.format(DEMOS_GIT_URL, demo_name)]
     subprocess.run(clone_cmd)
@@ -134,7 +135,7 @@ def gnomehat_demo(experiments_dir, demo_name):
 
 
 def gnomehat_logs(experiments_dir):
-    # todo: security
+    # todo: security lol
     os.system('tail -f {}/*.txt'.format(experiments_dir))
 
 
