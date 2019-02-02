@@ -141,13 +141,15 @@ def gnomehat_logs(experiments_dir):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2 or '--help' in sys.argv:
+        print('Command-line interface for Gnomehat, the simple experiment tracker')
         print('Usage:')
         print('\tgnomehat start [experiments_dir]')
+        print('\tgnomehat restart')
         print('\tgnomehat stop')
         print('\tgnomehat status')
-        print('\tgnomehat restart')
         print('\tgnomehat logs')
-        print('\tgnomehat [-n namespace] [-m message] <my_experiment.py> [--my-options ...]')
+        print('\tgnomehat run [-n namespace] [-m message] <command...>')
+        print('Note: "gnomehat" is an alias to "gnomehat run"')
         exit(1)
     command = sys.argv[1]
     if command == 'start':
