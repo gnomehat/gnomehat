@@ -271,17 +271,18 @@ def experiment_visdom(experiment_namespace, experiment_id):
 
 
 # Tail -f the given filename in a websocket process
-# Return the port number of the running websocketd
+# Return the port number of the running websocket_tail
 def spawn_console_websocket(filename):
     # Clean up any previous unused sockets for this experiment
     # TODO: something much much more sophisticated
-    os.system('pkill -f websocketd')
+    os.system('pkill -f websocket_tail')
 
     portnum = random.randint(20000, 20999)
-    # TODO proper input sanitizing and process pool and resource management and and ...
-    cmd = 'websocketd --port {:d} stdbuf -i0 -o0 -e0 tail -n 100 -f {} &'.format(portnum, filename)
-    print("Running {}".format(cmd))
-    os.system(cmd)
+    cmd = ['websocket_tail', filename, '--port={:d}'.format(portnum)]
+    subprocess.Popen(cmd)
+
+    # HACK: Wait for tail to start running
+    time.sleep(1)
     return portnum
 
 

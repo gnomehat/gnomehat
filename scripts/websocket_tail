@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+"""
+Usage:
+    websocket_tail FILENAME [--port=<portnum>]
+
+Options:
+  FILENAME           File to target with "tail -F" command
+  --port=<portnum>   Integer port to serve websocket [default: 8765]
+"""
+import asyncio
+import websockets
+import time
+import subprocess
+import sys
+import docopt
+import functools
+
+
+@asyncio.coroutine
+def serve_websocket_client(websocket, path, filename):
+    #name = yield from websocket.recv()
+    print('Tailing file {} to socket {}'.format(websocket, filename))
+    cmd = ['tail', '-n', '100', '-F', filename]
+    f = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    while True:
+        line = str(f.stdout.readline(), 'utf-8')
+        yield from websocket.send(line)
+
+
+if __name__ == '__main__':
+    opts = docopt.docopt(__doc__)
+    filename = opts['FILENAME']
+    port = int(opts['--port']) if opts['--port'] else 8765
+
+    print('Starting websocket server on port {}'.format(port))
+    client = functools.partial(serve_websocket_client, filename=filename)
+    start_server = websockets.serve(client, '0.0.0.0', port)
+
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()

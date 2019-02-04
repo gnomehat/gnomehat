@@ -6,4 +6,5 @@ pytest
 pytz
 docopt
 requests
+websocket
 git+https://github.com/lwneal/visdomino
