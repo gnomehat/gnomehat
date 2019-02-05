@@ -9,23 +9,13 @@ import subprocess
 from socket import gethostname
 import requests
 import signal
+from datetime import datetime
 from gnomehat import sysinfo
-
-import logging
-logger = logging.getLogger('worker')
 
 CHAT_URL = os.environ.get('GNOMEHAT_CHAT_URL')
 
 def log(*args):
     print(*args)
-    #logger.info(*args)
-
-
-def configure_logger(experiments_dir):
-    timestamp = str(int(time.time()))
-    log_filename = os.path.join(experiments_dir, 'worker_{}.txt'.format(timestamp))
-    logger.addHandler(logging.FileHandler(log_filename))
-    logger.setLevel(logging.DEBUG)
 
 
 def chat_notification(msg):
@@ -152,10 +142,9 @@ def run_experiment(dirname):
 def execute_runscript(dirname, env=None):
     # Run the experiment
     with open('stdout.txt', 'a') as log_fp:
-        timestamp = subprocess.check_output('date').decode('utf-8').strip()
-        log('Writing to the logfile...')
-        log_fp.write('[Worker starting experiment at {}]\n'.format(timestamp))
-        log('calling subprocess.Popen')
+        log('Worker opening stdout.txt...')
+        log_fp.write('[Worker starting experiment at {}]\n'.format(get_timestamp()))
+        log('Worker starting subprocess.Popen()')
         proc = subprocess.Popen('./gnomehat_start.sh',
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
@@ -164,20 +153,28 @@ def execute_runscript(dirname, env=None):
                                 bufsize=1,
                                 universal_newlines=True,
                                 preexec_fn=os.setsid)
-        log('reading from subprocess...()')
+        log('Worker reading from subprocess...')
         for line in iter(proc.stdout.readline, ''):
             if os.path.exists('worker_abort'):
-                log('Aborting experiment {}'.format(dirname))
+                log('Worker aborting experiment {}'.format(dirname))
+                log_fp.write('[Worker recieved termination signal at {}]'.format(get_timestamp()))
                 os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                 raise Exception("Abort experiment")
-            log_fp.write(line)
+            timestamp = datetime.now().strftime('%H:%M:%S')
+            log_fp.write('[{}] {}'.format(timestamp, line))
             log_fp.flush()
-        log('process is dead, stdout is closed')
-    log("Finished running experiment {}".format(dirname))
+        proc.wait()
+        log_fp.write('[Worker finished experiment at {}, return code {}]'.format(get_timestamp(), proc.returncode))
+        log_fp.write('')
+        log('Worker closing files...')
+    log("Worker finished running experiment {}".format(dirname))
+
+
+def get_timestamp():
+    return subprocess.check_output('date').decode('utf-8').strip()
 
 
 def main(experiments_dir):
-    #configure_logger(experiments_dir)
     gpu = get_gpu()
     log('Worker starting with GPU {} in {}'.format(gpu, experiments_dir))
     os.chdir(experiments_dir)
