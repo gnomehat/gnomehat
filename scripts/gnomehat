@@ -173,15 +173,26 @@ def gnomehat_logs(experiments_dir):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2 or '--help' in sys.argv:
-        print('Command-line interface for Gnomehat, the simple experiment tracker')
-        print('Usage:')
+        print('\n\t\tGnomehat: the simple experiment tracker')
+        print('Command-line interface')
+        print('\nUsage:')
         print('\tgnomehat start [experiments_dir]')
-        print('\tgnomehat restart')
         print('\tgnomehat stop')
+        print('\tgnomehat restart')
         print('\tgnomehat status')
         print('\tgnomehat logs')
         print('\tgnomehat run [-n namespace] [-m message] <command...>')
-        print('Note: "gnomehat" is an alias to "gnomehat run"')
+        print('')
+        print('start: Starts a gnomehat_server daemon and one gnomehat_worker per GPU')
+        print('stop: Kills all gnomehat daemons on this machine')
+        print('restart: Alias for gnomehat stop && gnomehat start')
+        print('status: Prints all running gnomehat processes')
+        print('logs: Tails log files for all gnomehat daemons')
+        print('run: Executes a shell command as a Gnomehat experiment. Requires an active server.')
+        print('\t-n namespace: Optional namespace to organize experiments. Defaults to "default"')
+        print('\t-m message: Optional comment string to remember why you ran this experiment')
+        print('Note: "gnomehat python" is an alias to "gnomehat run python"')
+        print('')
         exit(1)
     command = sys.argv[1]
     if command == 'start':
