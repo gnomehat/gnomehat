@@ -22,14 +22,14 @@ var defArgs = {
     serverName: '127.0.0.1',
     port: 8080,
     socketProto: 'ws',
-    bufferLines: 2000,
+    bufferLines: 500,
     replElName: 'output',
     inputElName: 'msg',
     replSendColor: 'white',
     replReplyColor: 'white',
     replOpenBgColor: '#0a0a0a',
     replClosedBgColor: '#933',
-    replCursor: '&#02502;',
+    replCursor: '$ ',
     replMargin: '0.4em auto 0.4em 0.4em',
     replPadding: '0.4em',
     replHeight: '640px',
@@ -75,42 +75,20 @@ function htmlDecode(str) {
     return hiddenEl.childNodes.length === 0 ? '' : hiddenEl.childNodes[0].nodeValue;
 }
 
-function nonGraphicalToPage(e) {
-    if (e.keyCode === 8) { // backspace
-        var len = splitBuf.length;
-        splitBuf[len - 1] = htmlEncode(htmlDecode(splitBuf[len - 1]).slice(0, -1));
-        replEl.innerHTML = splitBuf.join('\n') + arg.replCursor;
-        replEl.scrollTop = 999999;
-    }
-}
-
-function typeToPage(e) {
-    if (e.keyCode === 13) { // enter
-        splitBuf[splitBuf.length] = '';
-        send();
-        replEl.innerHTML = splitBuf.join('\n') + arg.replCursor;
-        replEl.scrollTop = 999999;
-        return false;
-    } else {
-        var len = splitBuf.length;
-        splitBuf[len - 1] = htmlEncode(splitBuf[len - 1] + String.fromCharCode(e.keyCode));
-        replEl.innerHTML = splitBuf.join('\n') + arg.replCursor;
-    }
-    replEl.scrollTop = 999999;
-}
-
 function replyToPage(str) {
+    // TODO: is there an easy way to keep a ring buffer of divs?
     var len = splitBuf.length;
+    if (len > arg.bufferLines) {
+        for (var i = 0; i < len - 1; i++) {
+            splitBuf[i] = splitBuf[i+1];
+        }
+    } else {
+        splitBuf[len] = '';
+    }
     splitBuf[len - 1] = '<span style="color:' + arg.replReplyColor + '">' + htmlEncode(str) + '</span>';
-    splitBuf[len] = '';
-    replEl.innerHTML = splitBuf.join('\n') + arg.replCursor;
-    replEl.scrollTop = 999999;
-}
 
-function send() {
-    ws.send(inputEl.value);
-    inputEl.value = '';
-    inputEl.focus();
+    replEl.innerHTML = splitBuf.join('') + arg.replCursor;
+    replEl.scrollTop = 999999;
 }
 
 // main
@@ -122,11 +100,6 @@ var ws = new WebSocket(arg.socketProto + '://' + arg.serverName + ':' + arg.port
 ws.addEventListener('open', function (event) { replEl.style.backgroundColor = arg.replOpenBgColor; });
 ws.addEventListener('message', function (event) { replyToPage(event.data, true); });
 ws.addEventListener('close', function (event) { replEl.style.backgroundColor = arg.replClosedBgColor; });
-replEl.innerHTML = arg.replCursor;
-inputEl.addEventListener('keypress', function (event) { typeToPage(event); });
-inputEl.addEventListener('keydown', function (event) { nonGraphicalToPage(event); });
 
 mainEl.appendChild(replEl);
-//mainEl.appendChild(inputEl);
-
 }
