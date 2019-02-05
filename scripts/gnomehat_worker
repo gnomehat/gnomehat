@@ -101,8 +101,18 @@ def run_experiments(experiments_dir):
     #log('Worker sleeping...')
 
 
+def create_python_environment(experiments_dir):
+    shell_environ = os.environ.copy()
+    env_bin_dir = os.path.join(experiments_dir, 'env', 'bin')
+    if os.path.exists(env_bin_dir):
+        shell_environ['PATH']= ':'.join([env_bin_dir, os.environ['PATH']])
+    return shell_environ
+
+
 def run_experiment(dirname):
     os.chdir(dirname)
+    env = create_python_environment(experiments_dir)
+
     lockfile_name = os.path.join(dirname, 'worker_lockfile')
     fp_lock = open(lockfile_name, 'w+')
     log("Attempting to acquire lock on {}".format(lockfile_name))
@@ -117,7 +127,11 @@ def run_experiment(dirname):
         with open('worker_started', 'w') as fp:
             fp.write(getinfo())
 
-        execute_runscript(dirname)
+        # Before execute_runscript(), the following preconditions must hold:
+        #   No other worker (on any machine) has acquired a lock on dirname
+        #   All repository-relevant files identified by `gnomehat run` exist in the cwd
+        #   The given env locates `python` at $EXPERIMENT_DIR/env/bin if it exists
+        execute_runscript(dirname, env=env)
 
         with open('worker_finished', 'w') as fp:
             fp.write('{}'.format(getinfo()))
@@ -135,7 +149,7 @@ def run_experiment(dirname):
     log('Finished cleaning up experiment {}'.format(dirname))
 
 
-def execute_runscript(dirname):
+def execute_runscript(dirname, env=None):
     # Run the experiment
     with open('stdout.txt', 'a') as log_fp:
         timestamp = subprocess.check_output('date').decode('utf-8').strip()
@@ -146,6 +160,7 @@ def execute_runscript(dirname):
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT,
+                                env=env,
                                 bufsize=1,
                                 universal_newlines=True,
                                 preexec_fn=os.setsid)
