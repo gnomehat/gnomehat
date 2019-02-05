@@ -8,7 +8,7 @@ import subprocess
 
 
 setup(name='gnomehat',
-    version='0.6.6',
+    version='0.7.0',
     description='GnomeHat: easy experiment control',
     author='Larry Neal',
     author_email='nealla@lwneal.com',
@@ -37,6 +37,7 @@ setup(name='gnomehat',
         'scripts/gnomehat_worker',
         'scripts/gnomehat_run',
         'scripts/gnomehat_cleanup',
+        'scripts/gnomehat_install_standalone_python',
         'scripts/gnomehat',
         'scripts/websocket_tail',
     ],

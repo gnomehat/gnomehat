@@ -7,7 +7,7 @@ import socket
 import time
 from gnomehat import sysinfo
 from gnomehat import hostinfo
-from gnomehat.file_input import read_directory_name
+from gnomehat.file_input import read_directory_name, read_option
 
 # The system consists of one server process (the GUI) and many workers
 # One worker should be alive per GPU of any connected machine
@@ -91,6 +91,7 @@ def load_config_file():
 
 def save_config_file(config):
     config_path = os.path.expanduser('~/.gnomehat')
+    print('Saving JSON config {} to file {}'.format(config, config_path))
     with open(config_path, 'w') as fp:
         fp.write(json.dumps(config, indent=2))
 
@@ -103,21 +104,52 @@ def get_experiments_dir():
     elif load_config_file():
         experiments_dir = load_config_file()['experiments_dir']
     else:
-        print('\n')
-        print('Hello!')
-        print('It looks like this is your first time running gnomehat')
-        print('(The GNOMEHAT_DIR variable has not been set.)')
-        print('\n')
-        print('Please choose a directory where your experiments should be stored.')
-        print('Enter a directory name (eg. /home/username/experiments)')
-        experiments_dir = read_directory_name()
-        print('\n')
-        print('Now using {} as the GNOMEHAT_DIR'.format(experiments_dir))
-        print('Saving {} to ~/.gnomehat'.format(experiments_dir))
-        save_config_file({'experiments_dir': experiments_dir})
+        experiments_dir = prompt_create_experiments_dir()
     print('Using experiments_dir: {}'.format(experiments_dir))
     os.makedirs(experiments_dir, exist_ok=True)
     return experiments_dir
+
+def prompt_create_experiments_dir():
+    print('\n')
+    print('Hello!')
+    print('It looks like this is your first time running gnomehat')
+    print('(The GNOMEHAT_DIR variable has not been set.)')
+    print('\n')
+    print('Please choose a directory where your experiments should be stored.')
+    print('Enter a directory name (eg. /home/username/experiments)')
+    experiments_dir = read_directory_name()
+    print('\n')
+
+    print('Now using {} as the GNOMEHAT_DIR'.format(experiments_dir))
+    save_config_file({'experiments_dir': experiments_dir})
+    print("")
+
+    print("")
+    print('Which way would you like Gnomehat to run Python?')
+    print("    (If you're not sure, select option #1)")
+    print("")
+    selection = read_option({
+        'miniconda': 'Run Gnomehat with Python 3.7 at {}/env'.format(experiments_dir),
+        'nothing': 'Use your current Python at: {}'.format(which_python()),
+    })
+    if selection == 'nothing':
+        print('Gnomehat will use the current Python: {}'.format(which_python()))
+    else:
+        print('Installing Gnomehat-only Python to {}/env'.format(experiments_dir))
+        install_miniconda_python(experiments_dir)
+        print('Gnomehat will use Miniconda Python at {}'.format(experiments_dir))
+    print("")
+
+    return experiments_dir
+
+
+def install_miniconda_python(experiments_dir):
+    cmd = ['gnomehat_install_standalone_python', os.path.join(experiments_dir, 'env')]
+    subprocess.run(cmd)
+
+
+def which_python():
+    return str(subprocess.check_output(['which', 'python']), 'utf').strip()
 
 
 def gnomehat_demo(experiments_dir, demo_name):

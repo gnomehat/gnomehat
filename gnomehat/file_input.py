@@ -63,3 +63,29 @@ def read_directory_name(prompt="Enter a directory: "):
     else:
         print('Error: path "{}" is not a valid, writable directory'.format(path))
         return read_directory_name(prompt)
+
+
+# Input: dict of keys/text explanations
+# Output: key of the option the user selects
+# User is prompted to type a number
+# User does not see the key, only the text explanation
+def read_option(options):
+    # Display options in alphabetical order by key
+    number_to_option = {}
+    keys = [k for k in sorted(options.keys())]
+    for i in range(1, len(options) + 1):
+        number_to_option[i] = keys[i - 1]
+
+    print('Select from the following choices:')
+
+    for i in number_to_option:
+        verbose_message = options[number_to_option[i]]
+        print('{}: {}'.format(i, verbose_message))
+    print()
+
+    selection = input().strip().lower()
+    valid_choices = [str(i) for i in number_to_option]
+    if selection not in valid_choices:
+        print('Please type one of the following: {}'.format(valid_choices))
+        return read_option(options)
+    return number_to_option[int(selection)]
