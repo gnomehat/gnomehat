@@ -275,10 +275,10 @@ def experiment_visdom(experiment_namespace, experiment_id):
 def spawn_console_websocket(filename):
     # Clean up any previous unused sockets for this experiment
     # TODO: something much much more sophisticated
-    os.system('pkill -f websocket_tail')
+    os.system('pkill -f gnomehat_websocket')
 
     portnum = random.randint(20000, 20999)
-    cmd = ['websocket_tail', filename, '--port={:d}'.format(portnum)]
+    cmd = ['gnomehat_websocket', filename, '--port={:d}'.format(portnum)]
     subprocess.Popen(cmd)
 
     # HACK: Wait for tail to start running

@@ -39,7 +39,7 @@ setup(name='gnomehat',
         'scripts/gnomehat_cleanup',
         'scripts/gnomehat_install_standalone_python',
         'scripts/gnomehat',
-        'scripts/websocket_tail',
+        'scripts/gnomehat_websocket',
     ],
     install_requires=[
         "requests",
