@@ -16,6 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+ * Modified for Gnomehat: half-duplex only, added bufferLines
+ * -lwneal 2019
+ */
+
 function wsrepl(customArgs) {
 
 var defArgs = {
@@ -84,11 +89,10 @@ function replyToPage(str) {
         }
     } else {
         splitBuf[len] = '';
+        replEl.scrollTop = 999999;
     }
     splitBuf[len - 1] = '<span style="color:' + arg.replReplyColor + '">' + htmlEncode(str) + '</span>';
-
     replEl.innerHTML = splitBuf.join('') + arg.replCursor;
-    replEl.scrollTop = 999999;
 }
 
 // main
