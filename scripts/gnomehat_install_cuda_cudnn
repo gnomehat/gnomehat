@@ -1,0 +1,106 @@
+#!/bin/bash
+# gnomehat_install_cuda
+# A script to check for, and install CUDA and CuDNN
+# This script aims to be an idempotent install-if-not-installed
+# If this script succeeds, PyTorch and Tensorflow should work
+# Check that this script has succeeded using gnomehat_doctor
+# Tested on Ubuntu Server 16.04 with GTX1080Ti
+
+CUDA_FILENAME="cuda_9.2.148_396.37_linux"
+CUDA_URL="https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_396.37_linux"
+
+CUDNN_FILENAME=cudnn-9.2-linux-x64-v7.2.1.38.tgz
+CUDNN_URL="http://downloads.deeplearninggroup.com/$CUDNN_FILENAME"
+CUDNN_SHA256="3e78f5f0edbe614b56f00ff2d859c5409d150c87ae6ba3df09f97d537909c2e9"
+
+function install_bare_requirements() {
+    apt install -y python python3 gcc make virtualenv python-dev python3-dev python-h5py
+}
+
+function install_openai_requirements() {
+    apt install -y cmake libopenmpi-dev zlib1g-dev ffmpeg libsm6 libxext6 libxrender1
+}
+
+function fail_msg() {
+    echo -e "[31m$*[39m"
+    exit 1
+}
+
+function warn_msg() {
+    echo -e "[33m$*[39m"
+}
+
+function download_cuda() {
+    wget -nc $CUDA_URL
+}
+
+function green() {
+    echo -e "[32m$*[39m"
+}
+
+function delete_evil_cache() {
+    green "\n\nDeleting NVIDIA cache directory at ~/.nv\n\n"
+    rm -rf ~/.nv/
+}
+
+if [ "$(id -u)" != "0" ]; then
+    echo "Install script must be run as root user"
+    echo "Usage: sudo $0"
+    exit
+fi
+
+delete_evil_cache
+
+green "\n\nInstalling Bootstrap Requirements...\n\n"
+install_bare_requirements
+
+green "\n\nInstalling requirements for OpenAI Gym...\n\n"
+install_openai_requirements
+
+green "\n\nDownloading CUDA installer...\n\n"
+download_cuda || fail_msg "Error while downloading CUDA installer"
+
+green "\nAttempting to disable Nouveau...\n"
+sudo modprobe -r nouveau || fail_msg "Error disabling Nouveau"
+sudo update-initramfs -u
+
+green "\nAttempting to install NVIDIA drivers and CUDA...\n"
+chmod +x $CUDA_FILENAME
+sudo ./$CUDA_FILENAME --silent --no-drm --no-opengl-libs --verbose --driver --toolkit || fail_msg "Error installing CUDA"
+
+nvidia-smi || fail_msg "Failed to run nvidia-smi, drivers are not properly installed"
+green "NVIDIA drivers are installed"
+
+green "\nAdding nvcc to the path...\n"
+echo 'export PATH=$PATH:/usr/local/cuda/bin' >> ~/.profile
+source ~/.profile
+
+green "\nChecking for nvcc install...\n"
+nvcc -V || fail_msg "Error: Could not find nvcc"
+green "CUDA utilities are installed"
+
+green "\nAdding cuda .so to the library path...\n"
+echo '/usr/local/cuda/lib64/' >> /etc/ld.so.conf
+ldconfig
+green "CUDA libraries are installed"
+
+green "\nChecking for libcuda.so...\n"
+ldconfig -p | grep libcuda || fail_msg "libcuda.so is not on the LD_LIBRARY_PATH"
+
+green "\nDownloading CUDNN...\n"
+green "\n(You agree to all NVIDIA terms and conditions)\n"
+wget -nc $CUDNN_URL || fail_msg "Failed to download cudnn-*.tgz"
+sha256sum $CUDNN_FILENAME | grep $CUDNN_SHA256 || fail_msg "Bad SHA256 hash for cudnn-*.tgz"
+
+green "\nInstalling CUDNN...\n"
+tar xzvf $CUDNN_FILENAME -C /usr/local || fail_msg "Failed to extract CUDNN libraries"
+ldconfig
+ldconfig -p | grep libcudnn || fail_msg "Failed to find cudnn.so"
+green "CUDNN libraries are installed"
+
+green "Installed Versions:"
+nvcc --version | grep release
+nvidia-smi --help | head -1
+ldconfig -p | grep libcudnn | head -1
+
+delete_evil_cache  # just to be sure

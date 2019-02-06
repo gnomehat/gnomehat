@@ -33,13 +33,15 @@ setup(name='gnomehat',
         ]
     },
     scripts=[
+        'scripts/gnomehat',
         'scripts/gnomehat_server',
         'scripts/gnomehat_worker',
         'scripts/gnomehat_run',
         'scripts/gnomehat_cleanup',
         'scripts/gnomehat_install_standalone_python',
-        'scripts/gnomehat',
         'scripts/gnomehat_websocket',
+        'scripts/gnomehat_install_cuda_cudnn',
+        'scripts/gnomehat_doctor',
     ],
     install_requires=[
         "requests",

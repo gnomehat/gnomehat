@@ -1,0 +1,76 @@
+#!/bin/bash
+# A script to check for common errors running CUDA/CuDNN/Tensorflow/et al on Ubuntu
+
+WARNINGS=""
+
+function fail_msg() {
+    echo -e "[31m$*[39m"
+    exit 1
+}
+
+function warn_msg() {
+    echo -e "[33m$*[39m"
+    WARNINGS="${*}\n${WARNINGS}"
+}
+
+function green() {
+    echo -e "[32m$*[39m"
+}
+
+
+
+(lspci | grep NVIDIA) && green "Found one or more NVIDIA hardware devices" \
+    || warn_msg "Warning: No NVIDIA hardware devices detected. Check that GPU cards are connected and properly powered."
+
+
+nvidia-smi && green "NVIDIA drivers are installed" \
+    || warn_msg "Warning: Could not run nvidia-smi. Check that NVIDIA drivers are installed."
+
+
+NVIDIA_DRIVER_VERSION=$(nvidia-smi --help | head -1)
+green "NVIDIA driver version is: $NVIDIA_DRIVER_VERSION"
+
+
+NVCC_VERSION=$(nvcc --version | grep release)
+if [ "$NVCC_VERSION" ]; then
+    green "CUDA is installed with compiler version: $NVCC_VERSION"
+else
+    warn_msg "Warning: Could not find nvcc. Check that CUDA is installed and /usr/local/cuda is included in PATH"
+fi
+
+
+CUDNN_VERSION=$(ldconfig -p | grep libcudnn)
+if [ "$CUDNN_VERSION" ]; then
+    green "CUDNN is installed at: $CUDNN_VERSION"
+else
+    warn_msg "Warning: Could not find libcudnn.so; Tensorflow and Keras will break (PyTorch should be OK)"
+fi
+
+
+green "\n\nChecking for ~/.nv cache..."
+if [ -e $HOME/.nv ]; then
+    echo "Caution: stale NVIDIA cache at $HOME/.nv"
+    read -p "Delete cache? " -n 1 -r
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rm -rf ~/.nv/
+    fi
+fi
+
+
+function enable_persistence_mode() {
+    echo "Caution: persistence mode is not enabled. Enabling persistence mode may alleviate crashes on some systems."
+    read -p "Enable persistence mode? " -n 1 -r
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        sudo nvidia-smi -pm ENABLED
+    fi
+}
+(nvidia-smi -q | grep -i Persistence.*Enabled) && green "\nPersistence mode is enabled" || enable_persistence_mode
+echo
+
+if [ ! -z "$WARNINGS" ]; then
+    echo "Found the following potential issues:"
+    echo -e ${WARNINGS}
+    exit 1
+else
+    green "No warnings found"
+fi
