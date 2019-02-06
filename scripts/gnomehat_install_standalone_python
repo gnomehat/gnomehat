@@ -28,4 +28,11 @@ mkdir -p $INSTALL_PATH
 
 echo "Beginning Miniconda install to path $INSTALL_PATH"
 ./$FILENAME -u -b -p $INSTALL_PATH
+
+# NOTE: The liberal Miniconda team jumped to Python 3.7 while the conservative
+#   Tensorflow team was still on 3.5; pick 3.6 for a wide range of compatibility
+echo "Editing Python version..."
+yes | $INSTALL_PATH/bin/conda install python=3.6
+echo "Python downgraded to 3.6"
+
 echo "Miniconda install complete"

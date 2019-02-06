@@ -129,7 +129,7 @@ def prompt_create_experiments_dir():
     print("    (If you're not sure, select option #1)")
     print("")
     selection = read_option({
-        'miniconda': 'Run Gnomehat with Python 3.7 at {}/env'.format(experiments_dir),
+        'miniconda': 'Run Gnomehat with Python 3.6 at {}/env'.format(experiments_dir),
         'nothing': 'Use your current Python at: {}'.format(which_python()),
     })
     if selection == 'nothing':
