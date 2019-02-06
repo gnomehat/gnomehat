@@ -5,6 +5,7 @@ import sys
 import subprocess
 import socket
 import time
+import tempfile
 from gnomehat import sysinfo
 from gnomehat import hostinfo
 from gnomehat.file_input import read_directory_name, read_option
@@ -153,11 +154,10 @@ def which_python():
 
 
 def gnomehat_demo(experiments_dir, demo_name):
-    TMP_DIR = '/tmp'
+    TMP_DIR = tempfile.mkdtemp()
     os.chdir(TMP_DIR)
 
-    # TODO: Set up dedicated org for demo zoo
-    DEMOS_GIT_URL = 'https://github.com/lwneal/'
+    DEMOS_GIT_URL = 'https://github.com/gnomehat'
     clone_cmd = ['git', 'clone', '{}/{}'.format(DEMOS_GIT_URL, demo_name)]
     subprocess.run(clone_cmd)
     os.chdir(demo_name)

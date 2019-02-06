@@ -7,11 +7,11 @@ Gnomehat stores your results and a git repository snapshot every time you run yo
 
 Gnomehat makes your experiments organized and reproducible, so you can focus on doing data science!
 
-![GnomeHat UI Screenshot](https://raw.githubusercontent.com/lwneal/gnomehat/master/screenshot.jpg)
+![GnomeHat UI Screenshot](https://raw.githubusercontent.com/gnomehat/gnomehat/master/screenshot.jpg)
 
 Install it with pip:
 ```bash
-pip install git+https://github.com/lwneal/gnomehat
+pip install git+https://github.com/gnomehat/gnomehat
 gnomehat start
 
 GnomeHat UI is now running at:
