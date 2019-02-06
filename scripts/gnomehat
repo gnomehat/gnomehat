@@ -125,6 +125,20 @@ def prompt_create_experiments_dir():
     save_config_file({'experiments_dir': experiments_dir})
     print("")
 
+    print('Checking for CUDA/CuDNN installation...')
+    result = subprocess.run('gnomehat_doctor')
+    if result.returncode != 0:
+        print('CUDA or CuDNN is not currently installed. Install them now?')
+        selection = read_option({
+            'install': 'Download and install CUDA and CUDNN',
+            'nothing': 'Do nothing',
+        })
+        if selection == 'install':
+            subprocess.run(['sudo', 'gnomehat_install_cuda_cudnn'])
+            subprocess.run('gnomehat_doctor')
+    else:
+        print('CUDA and CuDNN are available')
+
     print("")
     print('Which way would you like Gnomehat to run Python?')
     print("    (If you're not sure, select option #1)")
@@ -181,6 +195,7 @@ if __name__ == '__main__':
         print('\tgnomehat restart')
         print('\tgnomehat status')
         print('\tgnomehat logs')
+        print('\tgnomehat doctor')
         print('\tgnomehat run [-n namespace] [-m message] <command...>')
         print('')
         print('start: Starts a gnomehat_server daemon and one gnomehat_worker per GPU')
@@ -188,6 +203,7 @@ if __name__ == '__main__':
         print('restart: Alias for gnomehat stop && gnomehat start')
         print('status: Prints all running gnomehat processes')
         print('logs: Tails log files for all gnomehat daemons')
+        print('doctor: Checks for common configuration problems')
         print('run: Executes a shell command as a Gnomehat experiment. Requires an active server.')
         print('\t-n namespace: Optional namespace to organize experiments. Defaults to "default"')
         print('\t-m message: Optional comment string to remember why you ran this experiment')

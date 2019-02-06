@@ -47,25 +47,25 @@ else
 fi
 
 
-green "\n\nChecking for ~/.nv cache..."
-if [ -e $HOME/.nv ]; then
-    echo "Caution: stale NVIDIA cache at $HOME/.nv"
-    read -p "Delete cache? " -n 1 -r
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf ~/.nv/
-    fi
-fi
+#green "\n\nChecking for ~/.nv cache..."
+#if [ -e $HOME/.nv ]; then
+#    echo "Caution: stale NVIDIA cache at $HOME/.nv"
+#    read -p "Delete cache? " -n 1 -r
+#    if [[ $REPLY =~ ^[Yy]$ ]]; then
+#        rm -rf ~/.nv/
+#    fi
+#fi
 
 
-function enable_persistence_mode() {
-    echo "Caution: persistence mode is not enabled. Enabling persistence mode may alleviate crashes on some systems."
-    read -p "Enable persistence mode? " -n 1 -r
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sudo nvidia-smi -pm ENABLED
-    fi
-}
-(nvidia-smi -q | grep -i Persistence.*Enabled) && green "\nPersistence mode is enabled" || enable_persistence_mode
-echo
+#function enable_persistence_mode() {
+#    echo "Caution: persistence mode is not enabled. Enabling persistence mode may alleviate crashes on some systems."
+#    read -p "Enable persistence mode? " -n 1 -r
+#    if [[ $REPLY =~ ^[Yy]$ ]]; then
+#        sudo nvidia-smi -pm ENABLED
+#    fi
+#}
+#(nvidia-smi -q | grep -i Persistence.*Enabled) && green "\nPersistence mode is enabled" || enable_persistence_mode
+#echo
 
 if [ ! -z "$WARNINGS" ]; then
     echo "Found the following potential issues:"
