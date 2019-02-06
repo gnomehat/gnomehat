@@ -8,7 +8,7 @@ import subprocess
 
 
 setup(name='gnomehat',
-    version='0.7.2',
+    version='0.7.3',
     description='GnomeHat: easy experiment control',
     author='Larry Neal',
     author_email='nealla@lwneal.com',
