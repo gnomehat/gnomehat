@@ -27,6 +27,19 @@ Examples:
     gnomehat -m "Add frob layers" python main.py --frob=True
 '''
 
+verbose = False
+def log(*args, **kwargs):
+    if verbose:
+        print(*args, **kwargs)
+
+
+# TODO: proper logging everywhere
+def enable_verbose_logging():
+    global verbose
+    verbose = True
+    log('Verbose logging enabled')
+
+
 def mkdirp(path):
     os.makedirs(path, exist_ok=True)
 
@@ -42,7 +55,7 @@ def make_target_dir(experiments_dir, experiment_name):
 
 
 def copy_repo(target_dir):
-    print('Copying current working repository to {}'.format(target_dir))
+    log('Copying current working repository to {}'.format(target_dir))
     # Check that this is a git repository
     try:
         subprocess.check_output(['git', 'describe', '--always'])
@@ -62,7 +75,7 @@ def copy_repo(target_dir):
     mkdirp(target_dir)
     os.chdir(target_dir)
     clone_cmd = ['git', 'clone', '--depth=1', 'file://{}'.format(source_dir), '.']
-    subprocess.check_output(clone_cmd)
+    subprocess.check_output(clone_cmd, stderr=subprocess.STDOUT)
     os.chdir(source_dir)
 
     # Get all potential untracked files in the current repo
@@ -74,7 +87,7 @@ def copy_repo(target_dir):
         dst_filename = os.path.join(target_dir, src_filename)
         mkdirp(os.path.dirname(dst_filename))
         shutil.copy2(src_filename, dst_filename)
-    print('Copied {} files to {}'.format(len(filenames), target_dir))
+    log('Copied {} files to {}'.format(len(filenames), target_dir))
 
 
 def build_start_sh(options):
@@ -112,6 +125,9 @@ def parse_args():
         elif sys.argv[i] in ['-n', '--namespace']:
             options['namespace'] = sys.argv[i+1]
             i += 2
+        elif sys.argv[i] in ['-v', '--verbose']:
+            enable_verbose_logging()
+            i += 1
         elif i >= len(sys.argv):
             # Missing command after 'gnomehat'
             raise ValueError
@@ -121,7 +137,7 @@ def parse_args():
             break
 
     if options['executable'] in ['python', 'python3']:
-        print('Executing Python script with args: {}'.format(options['args']))
+        log('Executing Python script with args: {}'.format(options['args']))
         # TODO: run pyflakes maybe?
 
     return options
@@ -152,18 +168,18 @@ if __name__ == '__main__':
     if experiments_dir is None:
         experiments_dir = input('Input an experiments directory:\n> ')
     namespace_dir = os.path.join(experiments_dir, options['namespace'])
-    print('Adding experiment to {}'.format(namespace_dir))
+    log('Adding experiment to {}'.format(namespace_dir))
     mkdirp(namespace_dir)
 
     # Create a copy of this experiment in target_dir
     experiment_name = make_experiment_name(namespace_dir)
-    print('Creating target directory {}'.format(experiment_name))
+    log('Creating target directory {}'.format(experiment_name))
     target_dir = os.path.join(namespace_dir, experiment_name)
     copy_repo(target_dir)
 
     # Write a .sh script containing the user-supplied command to be run
     os.chdir(target_dir)
-    print('Creating {}/gnomehat_start.sh'.format(target_dir))
+    log('Creating {}/gnomehat_start.sh'.format(target_dir))
     with open('gnomehat_start.sh', 'w') as fp:
         fp.write(build_start_sh(options))
     chmodx('gnomehat_start.sh')
