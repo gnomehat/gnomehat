@@ -73,6 +73,7 @@ def run_websocket_server(experiments_dir, port=8765):
 def gnomehat_stop():
     # TODO: Send a special signal maybe?
     os.system('pkill -f gnomehat_server')
+    os.system('pkill -f gnomehat_websocket')
     os.system('pkill -f gnomehat_worker')
     # TODO: Mark jobs as cancelled so they don't stay eternally 'still running'
 

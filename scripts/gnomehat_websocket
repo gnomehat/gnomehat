@@ -19,7 +19,7 @@ import json
 import select
 
 config = {}
-
+TAIL_LINES = 500
 
 @asyncio.coroutine
 def serve_public_client(websocket, path):
@@ -49,7 +49,7 @@ def serve_public_client(websocket, path):
     # Start a tail -F process (which should work even if stdout.txt doesn't exist yet)
     print('Generating standard output stream for experiment {}'.format(requested_experiment))
     stdout_filename = os.path.join(config['experiments_dir'], requested_namespace, requested_experiment, 'stdout.txt')
-    cmd = ['tail', '-n', '100', '-F', stdout_filename]
+    cmd = ['tail', '-n', str(TAIL_LINES), '-F', stdout_filename]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Set the subprocess stdout to nonblocking with a fcntl flag
@@ -63,9 +63,9 @@ def serve_public_client(websocket, path):
         if proc_output:
             line = str(proc_output, 'utf-8')
             yield from websocket.send(line)
-            yield from asyncio.sleep(.01)
+            yield from asyncio.sleep(.001)
         else:
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(.1)
 
 
 if __name__ == '__main__':
