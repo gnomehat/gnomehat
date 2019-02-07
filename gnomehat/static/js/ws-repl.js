@@ -25,6 +25,8 @@ function wsrepl(customArgs) {
 
 var defArgs = {
     serverName: '127.0.0.1',
+    experiment_namespace: '',
+    experiment_id: '',
     port: 8080,
     socketProto: 'ws',
     bufferLines: 500,
@@ -100,10 +102,28 @@ function replyToPage(str) {
 sty.innerHTML = '#' + arg.replElName + ' {\n margin: ' + arg.replMargin + ';\n padding: ' + arg.replPadding + ';\n height: ' + arg.replHeight + ';\n width: ' + arg.replWidth + ';\n color: ' + arg.replSendColor + ';\n background-color: ' + arg.replClosedBgColor + ';\n border-width: ' + arg.replBorderWidth + ';\n border-color: ' + arg.replBorderColor + ';\n border-style: ' + arg.replBorderStyle + ';\n text-align: ' + arg.replTextAlign + ';\n overflow: ' + arg.replOverflow + ';\n}\n#' + arg.inputElName + ' {\n margin: ' + arg.inputMargin + ';\n padding: ' + arg.inputPadding + ';\n width: ' + arg.inputWidth + ';\n height: ' + arg.inputHeight + ';\n}';
 document.getElementsByTagName('head')[0].appendChild(sty);
 
-var ws = new WebSocket(arg.socketProto + '://' + arg.serverName + ':' + arg.port);
-ws.addEventListener('open', function (event) { replEl.style.backgroundColor = arg.replOpenBgColor; });
-ws.addEventListener('message', function (event) { replyToPage(event.data, true); });
-ws.addEventListener('close', function (event) { replEl.style.backgroundColor = arg.replClosedBgColor; });
+var wsurl = arg.socketProto + '://' + arg.serverName + ':' + arg.port + '/stdoutstream';
+var ws = new WebSocket(wsurl);
+
+ws.addEventListener('open', function (event) {
+    replEl.style.backgroundColor = arg.replOpenBgColor;
+    // Send a Hello message
+    console.log('Connected to websocket server, sending HELLO message...');
+    ws.send(JSON.stringify({
+        "experiment_namespace": arg.experiment_namespace,
+        "experiment_id": arg.experiment_id
+    }));
+    console.log('Listening to logs for namespace ' + arg.gnomehatNamespace + ' experiment ' + arg.gnomehatExperiment);
+});
+
+ws.addEventListener('message', function (event) {
+    replyToPage(event.data, true);
+});
+
+ws.addEventListener('close', function (event) {
+    console.log('Websocket closed');
+    replEl.style.backgroundColor = arg.replClosedBgColor;
+});
 
 mainEl.appendChild(replEl);
 }

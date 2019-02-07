@@ -22,6 +22,11 @@
   </div>
 </body>
 <script>
-wsrepl({serverName: '{{ websocket_host }}', port: {{ websocket_port }} });
+    wsrepl({
+        serverName: '{{ websocket_host }}',
+        port: {{ websocket_port }},
+        experiment_namespace: '{{ experiment_namespace }}',
+        experiment_id: '{{ experiment_id }}'
+    });
 </script>
 </html>

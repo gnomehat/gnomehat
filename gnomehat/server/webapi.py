@@ -209,8 +209,7 @@ def view_experiment(experiment_namespace, experiment_id):
         })
     image_groups.sort(key=lambda x: x['name'])
 
-    # When this page is viewed, spawn a websocketd
-    console_port = spawn_console_websocket(os.path.join(dir_path, 'stdout.txt'))
+    console_port = 8765
 
     # When this page is viewed, spawn a Tensorboard server (if applicable)
     tensorboard_port = spawn_tensorboard(os.path.join(dir_path, 'runs'))
@@ -268,22 +267,6 @@ def experiment_visdom(experiment_namespace, experiment_id):
     time.sleep(1)
 
     return flask.redirect(visdom_url)
-
-
-# Tail -f the given filename in a websocket process
-# Return the port number of the running websocket_tail
-def spawn_console_websocket(filename):
-    # Clean up any previous unused sockets for this experiment
-    # TODO: something much much more sophisticated
-    os.system('pkill -f gnomehat_websocket')
-
-    portnum = random.randint(20000, 20999)
-    cmd = ['gnomehat_websocket', filename, '--port={:d}'.format(portnum)]
-    subprocess.Popen(cmd)
-
-    # HACK: Wait for tail to start running
-    time.sleep(1)
-    return portnum
 
 
 def spawn_tensorboard(logdir):

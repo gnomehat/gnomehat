@@ -13,11 +13,15 @@ from gnomehat.file_input import read_directory_name, read_option
 # The system consists of one server process (the GUI) and many workers
 # One worker should be alive per GPU of any connected machine
 def gnomehat_start(experiments_dir):
-    # Check the server, restart it if needed
+    # Check the webapi server, restart it if needed
     if hostinfo.server_ok(experiments_dir):
         print('Host: Nothing to do, server is already running')
     else:
-        run_server(experiments_dir)
+        run_web_server(experiments_dir)
+
+    # Restart the websocket server
+    print('Starting websocket service...')
+    run_websocket_server(experiments_dir)
 
     # HACK: kill and restart all the workers
     # TODO: proper daemonization, maybe supervisord, maybe upstart?
@@ -52,11 +56,18 @@ def run_worker(experiments_dir, gpu_idx):
     os.system(cmd)
 
 
-def run_server(experiments_dir):
+def run_web_server(experiments_dir):
     print('Starting server at {}...'.format(experiments_dir))
     cmd = 'nohup gnomehat_server {0} > {0}/server.txt 2>&1 &'.format(experiments_dir)
     os.system(cmd)
     print('Server started at {}'.format(experiments_dir))
+
+
+def run_websocket_server(experiments_dir, port=8765):
+    os.system('pkill -f gnomehat_websocket')
+    cmd = 'nohup gnomehat_websocket --experiments_dir={0} --port={1} >> {0}/websocket_server.txt 2>&1 &'.format(experiments_dir, port)
+    os.system(cmd)
+    print('Spawned gnomehat_websocket on port {}'.format(port))
 
 
 def gnomehat_stop():

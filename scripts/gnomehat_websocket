@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 """
 Usage:
-    websocket_tail FILENAME [--port=<portnum>]
+    webstdio --experiments_dir=<dir> [--port=<portnum>]
 
 Options:
-  FILENAME           File to target with "tail -F" command
-  --port=<portnum>   Integer port to serve websocket [default: 8765]
+  --port=<portnum>          Integer port to serve websocket [default: 8765]
+  --experiments_dir=<dir>   Directory name of gnomehat experiments
 """
+import os
 import asyncio
 import websockets
 import time
@@ -14,27 +15,66 @@ import subprocess
 import sys
 import docopt
 import functools
+import json
+import select
+
+config = {}
 
 
 @asyncio.coroutine
-def serve_websocket_client(websocket, path, filename):
-    #name = yield from websocket.recv()
-    print('Tailing file {} to socket {}'.format(websocket, filename))
-    cmd = ['tail', '-n', '100', '-F', filename]
-    f = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def serve_public_client(websocket, path):
+    if path != '/stdoutstream':
+        print('Error: did not recognize websocket request path')
+        return
+    print('Waiting for request_data...')
+    request_data = yield from websocket.recv()
+    print('Validating websocket request...')
+
+    # client says hello with a friendly json message
+    client_hello = json.loads(request_data)
+
+    # let's see which experiment this client wants to listen to
+    requested_namespace = os.path.split(client_hello['experiment_namespace'])[-1]
+    requested_experiment = os.path.split(client_hello['experiment_id'])[-1]
+
+    # validate that this is a real namespace and experiment
+    namespaces = os.listdir(config['experiments_dir'])
+    if requested_namespace not in namespaces:
+        raise ValueError("Requested namespace does not exist")
+
+    experiments = os.listdir(os.path.join(config['experiments_dir'], requested_namespace))
+    if requested_experiment not in experiments:
+        raise ValueError("Requested experiment does not exist")
+
+    # Start a tail -F process (which should work even if stdout.txt doesn't exist yet)
+    print('Generating standard output stream for experiment {}'.format(requested_experiment))
+    stdout_filename = os.path.join(config['experiments_dir'], requested_namespace, requested_experiment, 'stdout.txt')
+    cmd = ['tail', '-n', '100', '-F', stdout_filename]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    # Set the subprocess stdout to nonblocking with a fcntl flag
+    from fcntl import fcntl, F_GETFL, F_SETFL
+    flags = fcntl(proc.stdout, F_GETFL) # get current p.stdout flags
+    fcntl(proc.stdout, F_SETFL, flags | os.O_NONBLOCK)
+
+    yield from websocket.send("Reading from file {}".format(stdout_filename))
     while True:
-        line = str(f.stdout.readline(), 'utf-8')
-        yield from websocket.send(line)
+        proc_output = proc.stdout.readline()
+        if proc_output:
+            line = str(proc_output, 'utf-8')
+            yield from websocket.send(line)
+            yield from asyncio.sleep(.01)
+        else:
+            yield from asyncio.sleep(1)
 
 
 if __name__ == '__main__':
     opts = docopt.docopt(__doc__)
-    filename = opts['FILENAME']
     port = int(opts['--port']) if opts['--port'] else 8765
+    config['experiments_dir'] = opts['--experiments_dir']
 
     print('Starting websocket server on port {}'.format(port))
-    client = functools.partial(serve_websocket_client, filename=filename)
-    start_server = websockets.serve(client, '0.0.0.0', port)
+    start_server = websockets.serve(serve_public_client, '0.0.0.0', port)
 
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()
