@@ -74,10 +74,14 @@ table {
 }
 
 .repl {
-  width: 900px;
+  width: 1000px;
   background-color: #0a0a0a;
   margin-bottom: 20px;
   margin: 20px;
+  /*overflow: auto; */
+  -ms-overflow-style: none; /* IE 11 */
+  scrollbar-width: none; /* Firefox 64 */
+  overflow: -moz-scrollbars-none;
 }
 
 .gradient {

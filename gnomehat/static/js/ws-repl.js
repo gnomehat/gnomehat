@@ -40,7 +40,7 @@ var defArgs = {
     replMargin: '0.4em auto 0.4em 0.4em',
     replPadding: '0.4em',
     replHeight: '640px',
-    replWidth: '900px',
+    replWidth: '1000px',
     replBorderWidth: '0.1em',
     replBorderColor: '#000',
     replBorderStyle: 'solid',
@@ -94,7 +94,7 @@ function replyToPage(str) {
         replEl.scrollTop = 999999;
     }
     splitBuf[len - 1] = '<span style="color:' + arg.replReplyColor + '">' + htmlEncode(str) + '</span>';
-    replEl.innerHTML = splitBuf.join('') + arg.replCursor;
+    replEl.innerHTML = splitBuf.join('') + '\n' + arg.replCursor;
 }
 
 // main
