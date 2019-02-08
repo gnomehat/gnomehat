@@ -99,7 +99,7 @@ function setResultText(text) {
   {% for experiment_id in metrics: %}
   <tr class="resultRow">
     <td>
-        <a href="/experiment/{{experiment_id}}">{{experiment_id}}</a>
+        <a href="/experiment/{{namespace}}/{{experiment_id}}">{{experiment_id}}</a>
     </td>
     {% for key in keys: %}
     <td name="data_cell_{{loop.index - 1}}">{{metrics[experiment_id].get(key, '-')}}</td>

@@ -66,6 +66,8 @@ def view_metrics(namespace):
     dir_name = os.path.join(config['EXPERIMENTS_DIR'], namespace)
     metrics = get_all_experiment_metrics(dir_name)
     all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
+
+    # Move 'notes' to the rightmost column
     if 'notes' in all_keys:
         all_keys.remove('notes')
     all_keys = list(sorted(all_keys))
@@ -74,6 +76,7 @@ def view_metrics(namespace):
     kwargs = {
         'metrics': metrics,
         'keys': all_keys,
+        'namespace': namespace,
     }
     return flask.render_template('metrics.html', **kwargs)
 
