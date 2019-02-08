@@ -194,7 +194,7 @@ if __name__ == '__main__':
     # For now, always background the process
     gui_url = hostinfo.get_hostinfo(experiments_dir).get('gui_url')
     if gui_url:
-        print("\nSee results at:")
+        print("\nExperiment is now running at:")
         print("\t{}/experiment/{}/{}\n".format(gui_url, options['namespace'], experiment_name))
     else:
         print("Error: Cannot read {}/hostinfo.json, please restart server".format(namespace_dir))

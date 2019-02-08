@@ -196,32 +196,34 @@ def gnomehat_logs(experiments_dir):
     # todo: security lol
     os.system('tail -f {}/*.txt'.format(experiments_dir))
 
+def print_usage_and_exit():
+    print('\n\t\tGnomehat: the simple experiment tracker')
+    print('Command-line interface')
+    print('\nUsage:')
+    print('\tgnomehat start [experiments_dir]')
+    print('\tgnomehat stop')
+    print('\tgnomehat restart')
+    print('\tgnomehat status')
+    print('\tgnomehat logs')
+    print('\tgnomehat doctor')
+    print('\tgnomehat run [-n namespace] [-m message] <command...>')
+    print('')
+    print('start: Starts a gnomehat_server daemon and one gnomehat_worker per GPU')
+    print('stop: Kills all gnomehat daemons on this machine')
+    print('restart: Alias for gnomehat stop && gnomehat start')
+    print('status: Prints all running gnomehat processes')
+    print('logs: Tails log files for all gnomehat daemons')
+    print('doctor: Checks for common configuration problems')
+    print('run: Executes a shell command as a Gnomehat experiment. Requires an active server.')
+    print('\t-n namespace: Optional namespace to organize experiments. Defaults to "default"')
+    print('\t-m message: Optional comment string to remember why you ran this experiment')
+    print('Note: "gnomehat python" is an alias to "gnomehat run python"')
+    print('')
+    exit(1)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2 or '--help' in sys.argv:
-        print('\n\t\tGnomehat: the simple experiment tracker')
-        print('Command-line interface')
-        print('\nUsage:')
-        print('\tgnomehat start [experiments_dir]')
-        print('\tgnomehat stop')
-        print('\tgnomehat restart')
-        print('\tgnomehat status')
-        print('\tgnomehat logs')
-        print('\tgnomehat doctor')
-        print('\tgnomehat run [-n namespace] [-m message] <command...>')
-        print('')
-        print('start: Starts a gnomehat_server daemon and one gnomehat_worker per GPU')
-        print('stop: Kills all gnomehat daemons on this machine')
-        print('restart: Alias for gnomehat stop && gnomehat start')
-        print('status: Prints all running gnomehat processes')
-        print('logs: Tails log files for all gnomehat daemons')
-        print('doctor: Checks for common configuration problems')
-        print('run: Executes a shell command as a Gnomehat experiment. Requires an active server.')
-        print('\t-n namespace: Optional namespace to organize experiments. Defaults to "default"')
-        print('\t-m message: Optional comment string to remember why you ran this experiment')
-        print('Note: "gnomehat python" is an alias to "gnomehat run python"')
-        print('')
-        exit(1)
+        print_usage_and_exit()
     command = sys.argv[1]
     if command == 'start':
         check_gpus()
@@ -248,6 +250,10 @@ if __name__ == '__main__':
     elif command == 'logs':
         experiments_dir = get_experiments_dir()
         gnomehat_logs(experiments_dir)
-    else:
+    elif command == 'run':
+        subprocess.run(['gnomehat_run'] + sys.argv[2:])
+    elif command == 'python':
         # The command 'gnomehat python train.py' is an alias for gnomehat_run
         subprocess.run(['gnomehat_run'] + sys.argv[1:])
+    else:
+        print_usage_and_exit()
