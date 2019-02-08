@@ -48,5 +48,6 @@ setup(name='gnomehat',
         "flask",
         "pytz",
         "websockets",
+        "docopt",
     ],
 )
