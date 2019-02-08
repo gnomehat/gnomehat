@@ -57,7 +57,7 @@ def serve_public_client(websocket, path):
     flags = fcntl(proc.stdout, F_GETFL) # get current p.stdout flags
     fcntl(proc.stdout, F_SETFL, flags | os.O_NONBLOCK)
 
-    yield from websocket.send("Reading from file {}".format(stdout_filename))
+    yield from websocket.send("[Reading from file {}...]\n".format(stdout_filename))
     while True:
         proc_output = proc.stdout.readline()
         if proc_output:
