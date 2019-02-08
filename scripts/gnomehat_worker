@@ -13,6 +13,7 @@ from datetime import datetime
 from gnomehat import sysinfo
 
 CHAT_URL = os.environ.get('GNOMEHAT_CHAT_URL')
+SLEEPINESS = 4
 
 def log(*args):
     print(*args)
@@ -184,7 +185,7 @@ def main(experiments_dir):
             namespace_dir = os.path.join(experiments_dir, namespace)
             if os.path.isdir(namespace_dir):
                 run_experiments(namespace_dir)
-        time.sleep(2)
+        time.sleep(SLEEPINESS)
 
 
 if __name__ == '__main__':
