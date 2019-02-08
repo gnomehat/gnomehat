@@ -161,7 +161,7 @@ def static_experiments_file(path):
 @app.route('/delete_job', methods=['POST'])
 def delete_job():
     print("Delete job: {}".format(flask.request.get_json()))
-    job_id = flask.request.get_json()['id']
+    job_id = flask.request.get_json()['id'].replace('..', '')
     dir_name = os.path.join(config['EXPERIMENTS_DIR'], job_id)
     print("Delete {}".format(job_id))
     print("Removing {}".format(dir_name))
