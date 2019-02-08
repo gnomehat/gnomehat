@@ -144,7 +144,7 @@ def execute_runscript(dirname, env=None):
     # Run the experiment
     with open('stdout.txt', 'a') as log_fp:
         log('Worker opening stdout.txt...')
-        log_fp.write('[Worker starting experiment at {}]\n'.format(get_timestamp()))
+        log_fp.write('[{} starting experiment at {}]\n'.format(gethostname(), get_timestamp()))
         log('Worker starting subprocess.Popen()')
         proc = subprocess.Popen('./gnomehat_start.sh',
                                 stdin=subprocess.PIPE,
