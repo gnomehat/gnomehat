@@ -14,7 +14,8 @@ setup(name='gnomehat',
     author_email='nealla@lwneal.com',
     packages=[
         'gnomehat',
-        'gnomehat/server'
+        'gnomehat/server',
+        'gnomehat/console',
     ],
     package_data={
         'gnomehat': [

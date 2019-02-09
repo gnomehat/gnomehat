@@ -95,31 +95,37 @@ def get_demos():
         'name': 'Mask_RCNN',
         'title': 'Semantic Segmentation',
         'description': 'Detect and outline people, cars, animals and more in input images.',
+        'attribution': "Waleed Abdulla's implementation of Kaiming He, Georgia Gkioxari, Piotr Dollar & Ross Girshick's CVPR 2017 paper",
         'image_url': 'static/images/screenshot_Mask_RCNN.jpg',
         }, {
         'name': 'progressive_growing_of_gans',
         'title': 'Progressive Growing of Generative Adversarial Networks',
         'description': 'Generate photorealistic faces of fake celebrities',
+        'attribution': 'Tero Karras, Timo Aila, Samuli Laine & Jakko Lehtinen, ICLR 2018',
         'image_url': 'static/images/screenshot_progressive_growing_of_gans.jpg',
         }, {
         'name': 'char_rnn',
         'title': 'Recurrent Neural Network for Text',
         'description': 'Generate Shakespeare, encyclopedia articles, and more.',
+        'attribution': "Sean Robertson (github.com/spro) implemented this based on Andrej Karpathy's famous luatorch demo",
         'image_url': 'static/images/screenshot_char_rnn.jpg',
         }, {
         'name': 'variational-autoencoder',
         'title': 'Variational Autoencoder',
         'description': 'Reconstruct MNIST digits with a variational autoencoder',
+        'attribution': "Diederik Kingma & Soumith Chintala, based on Kingma's famous 2013 paper",
         'image_url': 'static/images/screenshot_variational_autoencoder.jpg',
         }, {
         'name': 'classifier-cifar10',
         'title': 'Image Classifier',
         'description': 'Use Gnomehat to find the best parameters for training a classification network.',
+        'attribution': 'CIFAR-10 was collected by Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton',
         'image_url': 'static/images/screenshot_classifier_cifar10.jpg',
         }, {
         'name': 'Rainbow',
         'title': 'Deep Reinforcement Learning for Atari',
         'description': 'Train Rainbow, the state-of-the-art deep RL agent for Atari',
+        'attribution': "Kai Arulkumaran's implementation of Deepmind's paper",
         'image_url': 'static/images/screenshot_Rainbow.jpg',
         },
     ]
@@ -129,10 +135,8 @@ def get_demos():
 def run_demo(demo_name):
     assert demo_name in [demo['name'] for demo in get_demos()]
 
-    # can't see any way this might possibly go wrong
-    # todo: proper temp dir that cleans itself up
-    os.chdir('/tmp')
-    cmd = 'rm -rf {0}; (gnomehat demo {0}; rm -rf {0}) &'.format(demo_name)
+    # Run a gnomehat job that runs "gnomehat demo"
+    cmd = 'gnomehat run --copy-source=False -m "demo tmp" gnomehat demo {}'.format(demo_name)
     subprocess.run(cmd, shell=True)
     return flask.redirect('/')
 
