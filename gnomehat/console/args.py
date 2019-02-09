@@ -9,7 +9,7 @@ import requests
 import argparse
 import json
 
-COMMANDS = [
+STANDARD_COMMANDS = [
     'start',
     'stop',
     'restart',
@@ -17,6 +17,8 @@ COMMANDS = [
     'demo',
     'logs',
     'run',
+]
+SPECIAL_COMMANDS = [
     'python',
 ]
 
@@ -46,11 +48,18 @@ def print_usage():
     print('')
 
 
+# Note that the following are both valid and equivalent:
+# gnomehat run -m "my experiment" python main.py
+# gnomehat -m "my experiment" python main.py
 def parse_gnomehat_args(argv):
-    for i, arg in enumerate(argv):
-        if arg in COMMANDS:
+    for i in range(len(argv)):
+        if argv[i] in STANDARD_COMMANDS:
             command = argv[i]
             remaining_args = argv[1:i] + argv[i+1:]
+            break
+        elif argv[i] in SPECIAL_COMMANDS:
+            command = 'run'
+            remaining_args = argv[1:]
             break
     else:
         raise ValueError('Invalid command')
