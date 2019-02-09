@@ -102,7 +102,7 @@ def parse_args(argv):
         'namespace': get_default_namespace(),
         'sourceless': False,
     }
-    i = 1
+    i = 0
     while True:
         if argv[i] in ['-m', '--message']:
             options['notes'] = argv[i+1]
