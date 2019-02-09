@@ -92,22 +92,28 @@ def view_demos():
 
 def get_demos():
     return [{
-        'name': 'Mask_RCNN',
-        'title': 'Semantic Segmentation',
-        'description': 'Detect and outline people, cars, animals and more in input images.',
-        'attribution': "Waleed Abdulla's implementation of Kaiming He, Georgia Gkioxari, Piotr Dollar & Ross Girshick's CVPR 2017 paper",
-        'image_url': 'static/images/screenshot_Mask_RCNN.jpg',
-        }, {
         'name': 'progressive_growing_of_gans',
         'title': 'Progressive Growing of Generative Adversarial Networks',
         'description': 'Generate photorealistic faces of fake celebrities',
         'attribution': 'Tero Karras, Timo Aila, Samuli Laine & Jakko Lehtinen, ICLR 2018',
         'image_url': 'static/images/screenshot_progressive_growing_of_gans.jpg',
         }, {
+        'name': 'Mask_RCNN',
+        'title': 'Semantic Segmentation',
+        'description': 'Detect and outline people, cars, animals and more in input images.',
+        'attribution': "Waleed Abdulla's implementation of He, Gkioxari, Dollar & Girshick (CVPR 2017)",
+        'image_url': 'static/images/screenshot_Mask_RCNN.jpg',
+        }, {
+        'name': 'CPPN',
+        'title': 'Compositional Pattern Producing Networks',
+        'description': 'Use generative adversarial networks to render trippy demoscene videos.',
+        'attribution': "Neale Ratzlaff's implementation of Kenneth Stanley's CPPN",
+        'image_url': 'static/images/screenshot_CPPN.jpg',
+        }, {
         'name': 'char_rnn',
         'title': 'Recurrent Neural Network for Text',
-        'description': 'Generate Shakespeare, encyclopedia articles, and more.',
-        'attribution': "Sean Robertson (github.com/spro) implemented this based on Andrej Karpathy's famous luatorch demo",
+        'description': 'Generate infinite fake Shakespeare dialogue',
+        'attribution': "Sean Robertson based on a luatorch demo by Andrej Karpathy",
         'image_url': 'static/images/screenshot_char_rnn.jpg',
         }, {
         'name': 'variational-autoencoder',
@@ -118,7 +124,7 @@ def get_demos():
         }, {
         'name': 'classifier-cifar10',
         'title': 'Image Classifier',
-        'description': 'Use Gnomehat to find the best parameters for training a classification network.',
+        'description': 'Find the optimal hyperparameters for an image classification network.',
         'attribution': 'CIFAR-10 was collected by Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton',
         'image_url': 'static/images/screenshot_classifier_cifar10.jpg',
         }, {
@@ -136,7 +142,7 @@ def run_demo(demo_name):
     assert demo_name in [demo['name'] for demo in get_demos()]
 
     # Run a gnomehat job that runs "gnomehat demo"
-    cmd = 'gnomehat run --copy-source=False -m "demo tmp" gnomehat demo {}'.format(demo_name)
+    cmd = 'gnomehat run --sourceless -m "demo tmp" gnomehat demo {}'.format(demo_name)
     subprocess.run(cmd, shell=True)
     return flask.redirect('/')
 
