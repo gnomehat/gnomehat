@@ -74,14 +74,14 @@ def copy_repo(target_dir):
     log('Copied {} files to {}'.format(len(filenames), target_dir))
 
 
-def build_start_sh(options):
+def build_start_sh(command, args):
     # TODO: Replace this with something more structured
     return '''#!/bin/bash
 if [ -f requirements.txt ]; then
   pip install -r requirements.txt
 fi
 script -q -c '{} {}' /dev/null
-'''.format(options['executable'], ' '.join(options['args']))
+'''.format(command, args)
 
 
 def chmodx(filename):
@@ -161,8 +161,10 @@ def gnomehat_run(options):
     # Write a .sh script containing the user-supplied command to be run
     os.chdir(target_dir)
     log('Creating {}/gnomehat_start.sh'.format(target_dir))
+    command = options['executable']
+    args = options['args']
     with open('gnomehat_start.sh', 'w') as fp:
-        fp.write(build_start_sh(options))
+        fp.write(build_start_sh(command, args))
     chmodx('gnomehat_start.sh')
 
     with open('gnomehat_notes.txt', 'w') as fp:
