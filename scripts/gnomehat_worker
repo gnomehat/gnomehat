@@ -11,6 +11,7 @@ import requests
 import signal
 from datetime import datetime
 from gnomehat import sysinfo
+import shutil
 
 CHAT_URL = os.environ.get('GNOMEHAT_CHAT_URL')
 SLEEPINESS = 4
