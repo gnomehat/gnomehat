@@ -105,6 +105,7 @@ def run_experiment(dirname):
     env = create_python_environment(experiments_dir)
 
     lockfile_name = os.path.join(dirname, 'worker_lockfile')
+    delete_when_finished = os.path.join(dirname, 'gnomehat_delete_when_finished')
     fp_lock = open(lockfile_name, 'w+')
     log("Attempting to acquire lock on {}".format(lockfile_name))
     try:
@@ -137,6 +138,9 @@ def run_experiment(dirname):
         fcntl.flock(fp_lock, fcntl.LOCK_UN)
         if os.path.exists(lockfile_name):
             os.remove(lockfile_name)
+        if os.path.exists(delete_when_finished):
+            log('Removing temporary directory {}'.format(dirname))
+            shutil.rmtree(dirname)
     log('Finished cleaning up experiment {}'.format(dirname))
 
 

@@ -99,6 +99,8 @@ def experiment_from_filesystem(dir_path, files_url):
     dir_contents = get_dir_contents(full_path)
     if 'gnomehat_start.sh' not in dir_contents:
         return None
+    if 'gnomehat_hide' in dir_contents:
+        return None
 
     image_url = default_image_url()
     last_modified_timestamp = started_at
