@@ -81,7 +81,7 @@ if [ -f requirements.txt ]; then
   pip install -r requirements.txt
 fi
 script -q -c '{} {}' /dev/null
-'''.format(command, args)
+'''.format(command, ' '.join(args))
 
 
 def chmodx(filename):
@@ -102,7 +102,7 @@ def parse_args(argv):
         'namespace': get_default_namespace(),
         'sourceless': False,
     }
-    i = 0
+    i = 1
     while True:
         if argv[i] in ['-m', '--message']:
             options['notes'] = argv[i+1]
@@ -155,7 +155,9 @@ def gnomehat_run(options):
     experiment_name = make_experiment_name(namespace_dir)
     log('Creating target directory {}'.format(experiment_name))
     target_dir = os.path.join(namespace_dir, experiment_name)
-    if not options['sourceless']:
+    if options['sourceless']:
+        mkdirp(target_dir)
+    else:
         copy_repo(target_dir)
 
     # Write a .sh script containing the user-supplied command to be run
