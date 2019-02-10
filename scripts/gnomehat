@@ -10,6 +10,7 @@ from gnomehat import sysinfo
 from gnomehat import hostinfo
 from gnomehat.file_input import read_directory_name, read_option
 
+from gnomehat.console import run
 from gnomehat.console.args import print_usage, parse_gnomehat_args
 
 
@@ -232,10 +233,9 @@ if __name__ == '__main__':
         experiments_dir = get_experiments_dir()
         gnomehat_logs(experiments_dir)
     elif command == 'run':
-        subprocess.run(['gnomehat_run'] + argv)
+        options = run.parse_args(argv)
+        run.gnomehat_run(options)
     elif command == 'python':
         # The command 'gnomehat python train.py' is an alias for gnomehat_run
-        subprocess.run(['gnomehat_run', 'python'] + argv)
-    else:
-        print_usage()
-        exit(1)
+        options = run.parse_args(['python'] + argv)
+        run.gnomehat_run(options)

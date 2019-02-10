@@ -11,6 +11,18 @@ import json
 
 from gnomehat import hostinfo
 
+USAGE = '''
+gnomehat_run: Run a shell command as a Gnomehat experiment
+
+Usage:
+    gnomehat_run [-m "message"] [-n namespace] <command ...>
+
+Examples:
+    gnomehat python main.py
+    gnomehat python my_experiment_with_args.py --arg1 foo --arg2 bar
+    gnomehat -m "Add frob layers" python main.py --frob=True
+'''
+
 verbose = False
 def log(*args, **kwargs):
     if verbose:
@@ -93,16 +105,14 @@ def chmodx(filename):
 #  gnomehat -m "my experiment" python train.py --arg1 --arg2
 # We want to parse left-to-right UNTIL we hit something that looks like a command
 def parse_args(argv):
-    # Surely no one will ever want to run a --help command inside a worker process
-    if '--help' in argv or len(argv) < 2:
-        raise ValueError
-
     options = {
         'notes': '',
         'namespace': get_default_namespace(),
-        'sourceless': False,
+        'ignore-git': False,
+        'delete-when-finished': False,
+        'hide-from-ui': False,
     }
-    i = 1
+    i = 0
     while True:
         if argv[i] in ['-m', '--message']:
             options['notes'] = argv[i+1]
@@ -113,12 +123,22 @@ def parse_args(argv):
         elif argv[i] in ['-v', '--verbose']:
             enable_verbose_logging()
             i += 1
-        elif argv[i] in ['--sourceless']:
-            options['sourceless'] = True
+        elif argv[i] in ['--ignore-git']:
+            options['ignore-git'] = True
             i += 1
+        elif argv[i] in ['--hide-from-ui']:
+            options['hide-from-ui'] = True
+            i += 1
+        elif argv[i] in ['--delete-when-finished']:
+            options['delete-when-finished'] = True
+            i += 1
+        elif argv[i] == '--help':
+            print(USAGE)
+            exit(0)
         elif i >= len(argv):
             # Missing command after 'gnomehat'
-            raise ValueError
+            print(USAGE)
+            exit(1)
         else:
             options['executable'] = argv[i]
             options['args'] = argv[i+1:]
@@ -155,7 +175,7 @@ def gnomehat_run(options):
     experiment_name = make_experiment_name(namespace_dir)
     log('Creating target directory {}'.format(experiment_name))
     target_dir = os.path.join(namespace_dir, experiment_name)
-    if options['sourceless']:
+    if options['ignore-git']:
         mkdirp(target_dir)
     else:
         copy_repo(target_dir)
@@ -171,6 +191,12 @@ def gnomehat_run(options):
 
     with open('gnomehat_notes.txt', 'w') as fp:
         fp.write(options['notes'])
+
+    if options['delete-when-finished']:
+        open('gnomehat_delete_when_finished', 'w').close()
+
+    if options['hide-from-ui']:
+        open('gnomehat_hide', 'w').close()
 
     # TODO: Interactive Mode
     # Display a tmux-style info bar: "Press ctrl+T to run in background"
