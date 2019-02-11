@@ -14,7 +14,7 @@ def parse_first_ipv4(line):
 
 def get_local_ip():
     lines = subprocess.check_output('ifconfig').decode('utf').splitlines()
-    lines = [line for line in lines if 'inet addr' in line]
+    lines = [line for line in lines if 'inet ' in line]
     addrs = [parse_first_ipv4(line) for line in lines]
     if not addrs:
         return None
