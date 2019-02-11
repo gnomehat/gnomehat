@@ -123,3 +123,41 @@ To stop the server and all workers, run `gnomehat stop`.
 
 By default, the GnomeHat server makes the `experiments_dir` you specify available to all local machines.
 If you're running GnomeHat on a server with a public IP, make sure port 8086 is not open to the world.
+
+## How It Works
+
+`gnomehat_run` assumes that your current working directory is a git
+repository.
+It creates a shallow clone of that git repository in a directory
+determined by your `~/.gnomehat` configuration file (default:
+`/home/yourname/experiments`).
+If any files have pending changes in `git status`, it copies those files
+as well.
+Finally, it writes a shell script, `gnomehat_start.sh` containing the
+command to be run, into the cloned repository.
+The configuration file for `gnomehat_run` is `~/.gnomehat`.
+
+`gnomehat_worker` is a daemon process that searches the experiments
+directory for experiments written by `gnomehat_run`.
+When an experiment is found, the worker process runs
+`./gnomehat_start.sh` until the command is complete.
+Each `gnomehat_worker` is bound to one GPU, and will not begin a job
+unless its GPU is idle.
+If available, `gnomehat_worker` will use the version of Python installed
+in the experiments directory (default: `/home/yourname/experiments/env`).
+
+`gnomehat_server` and `gnomehat_websocket` are HTTP daemons that serve
+the browser-based GnomeHat user interface.
+You can view and manage experiments by connecting to this UI with your
+browser on the `gnomehat_server` port (default: [http://localhost:8086]).
+If you are running GnomeHat on a remote machine (for example, a server
+or a workstation connected via VPN) then you will need enable access to
+the local network during setup, and then navigate to the IP address of
+your GnomeHat server (example: [http://192.168.1.123:8086]).
+Server configuration is stored in `/home/yourname/experiments/hostinfo.json`.
+
+The `gnomehat_start` command will start server and worker processes on
+the current machine.
+One worker process is started per GPU.
+
+
