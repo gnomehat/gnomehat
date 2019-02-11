@@ -63,8 +63,7 @@ def list_metrics():
 
 @app.route('/metrics/<namespace>')
 def view_metrics(namespace):
-    dir_name = os.path.join(config['EXPERIMENTS_DIR'], namespace)
-    metrics = get_all_experiment_metrics(dir_name)
+    metrics = get_all_experiment_metrics(config['EXPERIMENTS_DIR'], namespace)
     all_keys = set(k for experiment in metrics.values() for k in experiment.keys())
 
     # Move 'notes' to the rightmost column

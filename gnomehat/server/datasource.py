@@ -285,13 +285,13 @@ def get_experiment_metrics(experiments_dir, experiment_id, number_format=None):
     return {}
 
 
-def get_all_experiment_metrics(experiments_dir, include_notes=True, number_format='%.04f'):
-    experiment_ids = get_experiment_ids(experiments_dir)
+def get_all_experiment_metrics(experiments_dir, namespace, include_notes=True, number_format='%.04f'):
+    experiment_ids = get_experiment_ids(os.path.join(experiments_dir, namespace))
     metrics = {}
     for eid in experiment_ids:
-        metrics[eid] = get_experiment_metrics(experiments_dir, eid, number_format)
+        metrics[eid] = get_experiment_metrics(os.path.join(experiments_dir, namespace), eid, number_format)
         if include_notes:
-            metrics[eid]['notes'] = get_notes(eid)
+            metrics[eid]['notes'] = get_notes(os.path.join(namespace, eid))
     return metrics
 
 
