@@ -1,11 +1,12 @@
 # GnomeHat
 
-A free and open source tool for automatic experiment version control.
+GnomeHat is a free and open source tool for automatic experiment version control.
 
 Deep network training and other data science jobs take a long time, and when you run a lot of them it's easy to lose track of which version of your code produced which results.
-Gnomehat stores your results and a git repository snapshot every time you run your code, so you can search all your old results and see exactly what code produced them.
 
-Gnomehat makes your experiments organized and reproducible, so you can focus on doing data science!
+Gnomehat stores every image, figure, saved model and log along with a snapshot of your code, so you can search all your old results and see exactly what code produced them.
+
+Gnomehat makes your experiments organized and reproducible, so you can focus on doing the science!
 
 ![GnomeHat UI Screenshot](https://raw.githubusercontent.com/gnomehat/gnomehat/master/screenshot.jpg)
 
@@ -18,15 +19,17 @@ GnomeHat UI is now running at:
     http://localhost:8086/
 ```
 
+Start it with `gnomehat start` and follow the on-screen directions.
+
 Then run any PyTorch, Tensorflow, or other Python command:
 
 ```bash
 cd my-cool-experiment
-gnomehat python train_network.py --dataset=/data/imagenet
+gnomehat python train_network.py
 
 Running my-cool-experiment version Tue Feb 29 01:23:45 PDT 2019
 See results at:
-    http://localhost:8086/experiment/my_cool_experiment_acd86cb7
+    http://localhost:8086/my_cool_experiment_acd86cb7
 ```
 
 The `gnomehat` command will make a snapshot copy of your source code and run it in the background.
@@ -50,8 +53,8 @@ If you start more experiments than that, the extra experiments will remain enque
 
 ## Requirements
 
-GnomeHat runs on Ubuntu 16.04 or higher and requires CUDA 8 or higher.
-You should be able to run the commands `nvidia-smi` and `nvcc` without errors.
+GnomeHat runs on Ubuntu 16.04 or higher and requires one or more NVIDIA GPUs.
+To use GnomeHat, you should be able to run the command `nvidia-smi` without errors.
 
 ### Your Code
 
@@ -119,11 +122,6 @@ To list all running GnomeHat processes, run `gnomehat status`.
 To stop the server and all workers, run `gnomehat stop`.
 
 
-## Security
-
-By default, the GnomeHat server makes the `experiments_dir` you specify available to all local machines.
-If you're running GnomeHat on a server with a public IP, make sure port 8086 is not open to the world.
-
 ## How It Works
 
 `gnomehat_run` assumes that your current working directory is a git
@@ -161,4 +159,12 @@ The `gnomehat_start` command will start server and worker processes on
 the current machine.
 One worker process is started per GPU.
 
+
+## Using Multiple Machines
+
+GnomeHat workers communicate with the server through files written to
+the experiments directory.
+To start workers on another machine, mount the experiments directory
+as a shared drive on both machines, then run `gnomehat start` on each
+machine.
 
