@@ -114,14 +114,6 @@ Every command that you run with `gnomehat` will run in the background, in its ow
 Images, logs, network checkpoints and other output files for every experiment are saved in an easy-to-search database that shows you *exactly* which code produced every result.
 
 
-## Managing Processes
-
-The GnomeHat server hosts a UI on port 8086.
-When you run `gnomehat start`, the server will be started if it is not already running, and one worker will start per GPU available on your machine.
-To list all running GnomeHat processes, run `gnomehat status`.
-To stop the server and all workers, run `gnomehat stop`.
-
-
 ## How It Works
 
 `gnomehat_run` assumes that your current working directory is a git
@@ -167,4 +159,45 @@ the experiments directory.
 To start workers on another machine, mount the experiments directory
 as a shared drive on both machines, then run `gnomehat start` on each
 machine.
+
+Multiple users can write to the same gnomehat experiments directory if
+file permissions are set correctly.
+Alternatively, each user can run their own gnomehat instance with
+separate experiments directories, using the same GPUs.
+Each worker will wait for its GPU to become idle before running.
+
+
+## Managing Processes
+
+When you run `gnomehat start`, the server will be started if it is not already running, and one worker will start per GPU available on your machine.
+To list all running GnomeHat processes, run `gnomehat status`.
+To stop the server and all workers, run `gnomehat stop`.
+If workers crash or you want to restart the service, run `gnomehat
+restart`.
+
+
+## Namespaces
+
+Each GnomeHat experiment is assigned to a namespace.
+Set the namespace of an experiment with the `-n` parameter. Example:
+
+```
+gnomehat run -n mynamespace mycommand
+```
+
+Or change the default namespace for all experiments by editing the
+`NAMESPACE` value in `~/.gnomehat`.
+
+
+## Adding Demos
+
+GnomeHat should
+
+## Bug Reports and Feature Requests
+
+GnomeHat is an early beta tool.
+Interfaces and functionality may change at any time.
+If you encounter bugs, crashes, or incompatibility, check the output of
+`gnomehat logs` and post in the Github Issues page above.
+
 
