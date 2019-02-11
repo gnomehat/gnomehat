@@ -147,7 +147,7 @@ def run_demo(demo_name):
     assert demo_name in [demo['name'] for demo in get_demos()]
 
     # Run a gnomehat job that runs "gnomehat demo"
-    cmd = 'gnomehat run -m "Loading demo {}" --delete-when-finished gnomehat demo {}'.format(demo_name, demo_name)
+    cmd = 'gnomehat run -m "Loading demo {}" --ignore-git --delete-when-finished gnomehat demo {}'.format(demo_name, demo_name)
     subprocess.run(cmd, shell=True)
     return flask.redirect('/')
 
