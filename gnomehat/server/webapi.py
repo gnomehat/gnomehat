@@ -104,6 +104,12 @@ def get_demos():
         'attribution': "Waleed Abdulla's implementation of He, Gkioxari, Dollar & Girshick (CVPR 2017)",
         'image_url': 'static/images/screenshot_Mask_RCNN.jpg',
         }, {
+        'name': 'sc2microbattle',
+        'title': 'StarCraft 2 Micromanagement Q-Learning',
+        'description': 'Train a convolutional network to fight battles in StarCraft II',
+        'attribution': "Blizzard, Deepmind, Oregon State University",
+        'image_url': 'static/images/screenshot_sc2microbattle.jpg',
+        }, {
         'name': 'CPPN',
         'title': 'Compositional Pattern Producing Networks',
         'description': 'Use generative adversarial networks to render trippy demoscene videos.',
