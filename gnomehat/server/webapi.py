@@ -231,8 +231,6 @@ def view_experiment(experiment_namespace, experiment_id):
         })
     image_groups.sort(key=lambda x: x['name'])
 
-    console_port = 8765
-
     # When this page is viewed, spawn a Tensorboard server (if applicable)
     tensorboard_port = spawn_tensorboard(os.path.join(dir_path, 'runs'))
 
@@ -242,7 +240,7 @@ def view_experiment(experiment_namespace, experiment_id):
         'files_url': files_url,
         'image_groups': image_groups,
         'websocket_host': websocket_host(),
-        'websocket_port': console_port,
+        'websocket_port': config['GNOMEHAT_WEBSOCKET_PORT'],
         'tensorboard_host': tensorboard_host(),
         'tensorboard_port': tensorboard_port,
     }

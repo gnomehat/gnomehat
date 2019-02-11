@@ -6,6 +6,7 @@ import requests
 DEFAULT_CONFIG = {
     'GNOMEHAT_SERVER_HOSTNAME': 'localhost',
     'GNOMEHAT_PORT': 8086,
+    'GNOMEHAT_WEBSOCKET_PORT': 8765,
     'GNOMEHAT_BIND_IP': '127.0.0.1',
     'GNOMEHAT_SERVER_TITLE': 'Gnomehat Experiments',
     'DEBUG': False,
