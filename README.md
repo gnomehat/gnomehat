@@ -189,10 +189,6 @@ Or change the default namespace for all experiments by editing the
 `NAMESPACE` value in `~/.gnomehat`.
 
 
-## Adding Demos
-
-GnomeHat should
-
 ## Bug Reports and Feature Requests
 
 GnomeHat is an early beta tool.
