@@ -56,6 +56,24 @@ table {
 .subtitle {
   font-size: 12pt;
 }
+.inputbox {
+    width: 800px;
+    margin-top: 5px;
+}
+.inputbox input {
+    width: 80%;
+    background: transparent;
+    border: none;
+}
+.inputbox button {
+    visibility: hidden;
+}
+.inputbox:hover button {
+    visibility: visible;
+}
+.inputbox:hover input {
+    background: white;
+}
 .headrow {
   margin: 10px;
 }

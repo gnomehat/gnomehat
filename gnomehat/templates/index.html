@@ -18,6 +18,20 @@
 function selectNamespace(name) {
   window.location = "/" + name;
 }
+function post(url, data) {
+  return fetch(url, {
+    method: "POST",
+    headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+    body: JSON.stringify(data)}
+  );
+}
+function saveNotes(experiment_id) {
+  var box_id = 'notes_' + experiment_id;
+  var inputBox = document.getElementById(box_id);
+  var notes = inputBox.value;
+  console.log('Updating notes for experiment ' + experiment_id);
+  post("/update_notes", {id: experiment_id, notes: notes});
+}
   </script>
 </head>
 <body>
@@ -63,15 +77,18 @@ function selectNamespace(name) {
               <br>
               {% endif %}
             </div>
-            <a href="experiment/{{ result['dir_name'] }}">
-              <span class=big>
+            <span class=big>
+              <a href="experiment/{{ result['dir_name'] }}">
                 <span class="experiment_name">{{ result['experiment_name'] }}</span>
                 <br>
                 <span class="headline">{{ result['headline'] }}</span>
+              </a>
                 <br>
-                <pre class="subtitle">{{ result['subtitle'] }}</pre>
-              </span>
-            </a>
+                <div class="inputbox">
+                    <input onfocusout="saveNotes('{{result['dir_name']}}')" type="text" id="notes_{{result['dir_name']}}" value="{{result['subtitle']}}"></input>
+                  <button onclick="saveNotes('{{result['dir_name']}}')">Save</button>
+                </div>
+            </span>
           </div>
           <div class="img_holder" height=128>
               <img src="{{result['image_url']}}" height=128 />

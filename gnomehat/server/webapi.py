@@ -205,6 +205,18 @@ def stop_job():
     return 'OK'
 
 
+@app.route('/update_notes', methods=['POST'])
+def update_notes():
+    print("Update notes: {}".format(flask.request.get_json()))
+    experiment_id = flask.request.get_json()['id'].replace('..', '')
+    notes = flask.request.get_json()['notes']
+    dir_name = os.path.join(config['EXPERIMENTS_DIR'], experiment_id)
+    print("Writing notes to {}".format(experiment_id))
+    with open(os.path.join(dir_name, 'gnomehat_notes.txt'), 'w') as fp:
+        fp.write(notes)
+    return 'OK'
+
+
 @app.route('/info')
 def get_info():
     info = server_config.get_config(config['EXPERIMENTS_DIR'])
