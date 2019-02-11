@@ -12,7 +12,7 @@ from gnomehat.file_input import read_directory_name, read_option
 
 from gnomehat.console import run
 from gnomehat.console.args import print_usage, parse_gnomehat_args
-from gnomehat.console.wizard import prompt_create_experiments_dir, load_config_file
+from gnomehat.console.wizard import prompt_create_experiments_dir, load_cli_config
 
 
 # The system consists of one server process (the GUI) and many workers
@@ -46,10 +46,10 @@ def gnomehat_start(experiments_dir):
 
 def self_check(experiments_dir):
     print('GnomeHat running self-check...')
-    time.sleep(2)
-    info = hostinfo.get_hostinfo(experiments_dir)
+    time.sleep(2)  # Ensure Flask app has plenty of time to initialize
+    config = hostinfo.get_hostinfo(experiments_dir)
     print('GnomeHat UI is now running at:')
-    print('\t{}'.format(info['gui_url']))
+    print('\thttp://{}:{}'.format(config['GNOMEHAT_SERVER_HOSTNAME'], config['GNOMEHAT_PORT']))
 
 
 def run_worker(experiments_dir, gpu_idx):
@@ -99,10 +99,10 @@ def gnomehat_restart_server(experiments_dir):
 def get_experiments_dir():
     if len(sys.argv) == 3:
         experiments_dir = sys.argv[2]
-    elif os.environ.get('GNOMEHAT_DIR'):
-        experiments_dir = os.environ['GNOMEHAT_DIR']
-    elif load_config_file():
-        experiments_dir = load_config_file()['experiments_dir']
+    elif os.environ.get('EXPERIMENTS_DIR'):
+        experiments_dir = os.environ['EXPERIMENTS_DIR']
+    elif 'EXPERIMENTS_DIR' in load_cli_config():
+        experiments_dir = load_cli_config()['EXPERIMENTS_DIR']
     else:
         experiments_dir = prompt_create_experiments_dir()
     print('Using experiments_dir: {}'.format(experiments_dir))

@@ -3,51 +3,40 @@ import os
 import json
 import socket
 import requests
-from gnomehat.local_ip import get_local_ip
 
+DEFAULT_CONFIG = {
+    'GNOMEHAT_SERVER_HOSTNAME': 'localhost',
+    'GNOMEHAT_PORT': 8086,
+    'GNOMEHAT_BIND_IP': '127.0.0.1',
+    'GNOMEHAT_SERVER_TITLE': 'Gnomehat Experiments',
+    'DEBUG': False,
+    'MAX_RESULTS_PER_PAGE': 100,
+    'IMAGE_EXTENSIONS': ['jpg', 'png', 'tiff', 'bmp', 'gif'],
+}
 
-def init_hostinfo(config):
-    experiments_dir = config['EXPERIMENTS_DIR']
-    port = config['GNOMEHAT_PORT']
-    print("Generating {}/hostinfo.json".format(experiments_dir))
-
-    # export GNOMEHAT_SERVER_URL=thismachine.mydomain.com to start a cluster
-    if os.environ.get('GNOMEHAT_SERVER_URL'):
-        hostname = os.environ.get('GNOMEHAT_SERVER_URL')
-    else:
-        hostname = get_local_ip()
-
-    info = {
-        'hostname': hostname,
-        'port': port,
-        'gui_url': 'http://{}:{}'.format(hostname, port),
-        'experiments_dir': experiments_dir,
-    }
-
-    # export GNOMEHAT_SERVER_URL=thismachine.mydomain.com to start a cluster
-    if os.environ.get('GNOMEHAT_SERVER_TITLE'):
-        info['server_title'] = os.environ.get('GNOMEHAT_SERVER_TITLE')
-
+def write_hostinfo(experiments_dir, config):
     filename = os.path.join(experiments_dir, 'hostinfo.json')
     with open(filename, 'w') as fp:
-        fp.write(json.dumps(info, indent=2))
+        fp.write(json.dumps(config, indent=2))
     print("Wrote hostinfo to {}".format(filename))
 
 
 def get_hostinfo(experiments_dir):
+    config = DEFAULT_CONFIG
     filename = os.path.join(experiments_dir, 'hostinfo.json')
-    if not os.path.exists(filename):
-        return None
-    return json.load(open(filename))
+    if os.path.exists(filename):
+        config.update(json.load(open(filename)))
+    config['EXPERIMENTS_DIR'] = experiments_dir
+    return config
 
 
 def server_ok(experiments_dir):
     hostinfo = get_hostinfo(experiments_dir)
     if hostinfo is None:
         return False
-    url = 'http://{}:{}/info'.format(hostinfo['hostname'], hostinfo['port'])
+    url = 'http://{}:{}/'.format(hostinfo['GNOMEHAT_SERVER_HOSTNAME'], hostinfo['GNOMEHAT_PORT'])
     try:
         info = requests.get(url)
-        return info
+        return True
     except:
         return False

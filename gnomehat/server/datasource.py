@@ -81,7 +81,7 @@ def get_result_dirs(experiments_dir):
 
     # Return the most recent N results
     result_dirs.sort(key=os.path.getmtime)
-    max_results = config['MAX_RESULTS']
+    max_results = config['MAX_RESULTS_PER_PAGE']
     result_dirs = result_dirs[-max_results:]
     return result_dirs
 

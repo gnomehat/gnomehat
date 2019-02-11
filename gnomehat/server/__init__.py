@@ -13,7 +13,6 @@ def arg(name):
 def run(app_config):
     config.update(app_config)
     from . import webapi
-    app.run(config.get('GNOMEHAT_HOST'),
+    app.run(config.get('GNOMEHAT_BIND_IP'),
             port=config.get('GNOMEHAT_PORT'),
-            debug=config.get('DEBUG'),
-            threaded=config.get('FLASK_THREADED'))
+            debug=config.get('DEBUG'))
