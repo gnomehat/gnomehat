@@ -10,6 +10,8 @@ import argparse
 import json
 
 from gnomehat import server_config
+from gnomehat.console.wizard import load_cli_config
+from gnomehat.file_input import read_directory_name
 
 USAGE = '''
 gnomehat_run: Run a shell command as a Gnomehat experiment
@@ -150,23 +152,15 @@ def parse_args(argv):
     return options
 
 
-def get_user_settings():
-    dotfile = os.path.expanduser('~/.gnomehat')
-    if os.path.exists(dotfile):
-        info = json.load(open(dotfile))
-        return info
-    return {}
-
-
 def get_default_namespace():
-    return get_user_settings().get('namespace', 'default')
+    return load_cli_config().get('NAMESPACE', 'default')
 
 
 def gnomehat_run(options):
     # Check the experiments directory
-    experiments_dir = get_user_settings().get('experiments_dir')
+    experiments_dir = load_cli_config().get('EXPERIMENTS_DIR')
     if experiments_dir is None:
-        experiments_dir = input('Input an experiments directory:\n> ')
+        experiments_dir = read_directory_name('Input an experiments directory:\n> ')
     namespace_dir = os.path.join(experiments_dir, options['namespace'])
     log('Adding experiment to {}'.format(namespace_dir))
     mkdirp(namespace_dir)
