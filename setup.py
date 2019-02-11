@@ -50,4 +50,5 @@ setup(name='gnomehat',
         "websockets",
         "docopt",
     ],
+    python_requires='>3',
 )
