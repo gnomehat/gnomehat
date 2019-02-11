@@ -154,7 +154,8 @@ If you are running GnomeHat on a remote machine (for example, a server
 or a workstation connected via VPN) then you will need enable access to
 the local network during setup, and then navigate to the IP address of
 your GnomeHat server (example: [http://192.168.1.123:8086]).
-Server configuration is stored in `/home/yourname/experiments/hostinfo.json`.
+Server configuration is stored in
+`/home/yourname/experiments/server_config.json`.
 
 The `gnomehat_start` command will start server and worker processes on
 the current machine.

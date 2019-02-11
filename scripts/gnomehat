@@ -7,7 +7,7 @@ import socket
 import time
 import tempfile
 from gnomehat import sysinfo
-from gnomehat import hostinfo
+from gnomehat import server_config
 from gnomehat.file_input import read_directory_name, read_option
 
 from gnomehat.console import run
@@ -19,7 +19,7 @@ from gnomehat.console.wizard import prompt_create_experiments_dir, load_cli_conf
 # One worker should be alive per GPU of any connected machine
 def gnomehat_start(experiments_dir):
     # Check the webapi server, restart it if needed
-    if hostinfo.server_ok(experiments_dir):
+    if server_config.server_ok(experiments_dir):
         print('Host: Nothing to do, server is already running')
     else:
         run_web_server(experiments_dir)
@@ -47,7 +47,7 @@ def gnomehat_start(experiments_dir):
 def self_check(experiments_dir):
     print('GnomeHat running self-check...')
     time.sleep(2)  # Ensure Flask app has plenty of time to initialize
-    config = hostinfo.get_hostinfo(experiments_dir)
+    config = server_config.get_config(experiments_dir)
     print('GnomeHat UI is now running at:')
     print('\thttp://{}:{}'.format(config['GNOMEHAT_SERVER_HOSTNAME'], config['GNOMEHAT_PORT']))
 

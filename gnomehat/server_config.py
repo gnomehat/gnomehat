@@ -1,4 +1,3 @@
-# The hostinfo.json file acts as a lockfile and a source of information for the server
 import os
 import json
 import socket
@@ -14,16 +13,16 @@ DEFAULT_CONFIG = {
     'IMAGE_EXTENSIONS': ['jpg', 'png', 'tiff', 'bmp', 'gif'],
 }
 
-def write_hostinfo(experiments_dir, config):
-    filename = os.path.join(experiments_dir, 'hostinfo.json')
+def write_config(experiments_dir, config):
+    filename = os.path.join(experiments_dir, 'gnomehat_config.json')
     with open(filename, 'w') as fp:
         fp.write(json.dumps(config, indent=2))
-    print("Wrote hostinfo to {}".format(filename))
+    print("Wrote server configuration to {}".format(filename))
 
 
-def get_hostinfo(experiments_dir):
+def get_config(experiments_dir):
     config = DEFAULT_CONFIG
-    filename = os.path.join(experiments_dir, 'hostinfo.json')
+    filename = os.path.join(experiments_dir, 'gnomehat_config.json')
     if os.path.exists(filename):
         config.update(json.load(open(filename)))
     config['EXPERIMENTS_DIR'] = experiments_dir
@@ -31,10 +30,8 @@ def get_hostinfo(experiments_dir):
 
 
 def server_ok(experiments_dir):
-    hostinfo = get_hostinfo(experiments_dir)
-    if hostinfo is None:
-        return False
-    url = 'http://{}:{}/'.format(hostinfo['GNOMEHAT_SERVER_HOSTNAME'], hostinfo['GNOMEHAT_PORT'])
+    config = get_config(experiments_dir)
+    url = 'http://{}:{}/'.format(config['GNOMEHAT_SERVER_HOSTNAME'], config['GNOMEHAT_PORT'])
     try:
         info = requests.get(url)
         return True

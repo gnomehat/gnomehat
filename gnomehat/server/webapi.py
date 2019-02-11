@@ -14,7 +14,7 @@ import sys
 import pytz
 import subprocess
 
-from gnomehat import sysinfo, hostinfo
+from gnomehat import sysinfo, server_config
 from gnomehat.server import app, config
 
 from gnomehat.server import datasource
@@ -207,7 +207,7 @@ def stop_job():
 
 @app.route('/info')
 def get_info():
-    info = hostinfo.get_hostinfo(config['EXPERIMENTS_DIR'])
+    info = server_config.get_config(config['EXPERIMENTS_DIR'])
     return json.dumps(info, indent=2)
 
 

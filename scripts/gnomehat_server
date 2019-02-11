@@ -3,10 +3,10 @@ import flask
 import json
 import sys
 from gnomehat import server
-from gnomehat import hostinfo
+from gnomehat import server_config
 
 
 if __name__ == '__main__':
     experiments_dir = sys.argv[1]
-    config = hostinfo.get_hostinfo(experiments_dir)
+    config = server_config.get_config(experiments_dir)
     server.run(config)

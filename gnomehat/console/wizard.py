@@ -7,11 +7,10 @@ import socket
 import time
 import tempfile
 from gnomehat import sysinfo
-from gnomehat import hostinfo
+from gnomehat import server_config
 from gnomehat.file_input import read_directory_name, read_option
 from gnomehat.local_ip import get_local_ip
 from gnomehat.console.args import print_usage, parse_gnomehat_args
-from gnomehat.hostinfo import write_hostinfo
 
 
 def load_cli_config():
@@ -23,7 +22,7 @@ def load_cli_config():
     return cfg
 
 
-def update_cli_config(config):
+def write_cli_config(config):
     config_path = os.path.expanduser('~/.gnomehat')
     print('Saving JSON config {} to file {}'.format(config, config_path))
     old_config = load_cli_config()
@@ -77,7 +76,7 @@ def prompt_create_experiments_dir():
 
 
     ############## Server Configuration ##############
-    config = hostinfo.get_hostinfo(experiments_dir)
+    config = server_config.get_config(experiments_dir)
 
     if os.environ.get('GNOMEHAT_SERVER_HOSTNAME'):
         config['GNOMEHAT_SERVER_HOSTNAME'] = os.environ.get('GNOMEHAT_SERVER_HOSTNAME')
@@ -110,11 +109,11 @@ def prompt_create_experiments_dir():
         config['GNOMEHAT_SERVER_TITLE'] = os.environ.get('GNOMEHAT_SERVER_TITLE')
 
     # Write server configuration
-    write_hostinfo(experiments_dir, config)
+    server_config.write_config(experiments_dir, config)
 
     # Write client configuration
     print('Now using {} as the EXPERIMENTS_DIR'.format(experiments_dir))
-    update_cli_config({'EXPERIMENTS_DIR': experiments_dir})
+    write_cli_config({'EXPERIMENTS_DIR': experiments_dir})
     return experiments_dir
 
 

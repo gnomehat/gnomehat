@@ -9,7 +9,7 @@ import requests
 import argparse
 import json
 
-from gnomehat import hostinfo
+from gnomehat import server_config
 
 USAGE = '''
 gnomehat_run: Run a shell command as a Gnomehat experiment
@@ -203,10 +203,8 @@ def gnomehat_run(options):
     # Open a connection to the worker and stream stdout/stderr
 
     # For now, always background the process
-    gui_url = hostinfo.get_hostinfo(experiments_dir).get('gui_url')
-    if gui_url:
-        print("\nExperiment is now running at:")
-        print("\t{}/experiment/{}/{}\n".format(gui_url, options['namespace'], experiment_name))
-    else:
-        print("Error: Cannot read {}/hostinfo.json, please restart server".format(namespace_dir))
+    config = server_config.get_config(experiments_dir)
+    gui_url = 'http://{}:{}'.format(config['GNOMEHAT_SERVER_HOSTNAME'], config['GNOMEHAT_PORT'])
+    print("\nExperiment is now running at:")
+    print("\t{}/experiment/{}/{}\n".format(gui_url, options['namespace'], experiment_name))
 
