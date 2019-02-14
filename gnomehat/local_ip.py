@@ -13,12 +13,17 @@ def parse_first_ipv4(line):
 
 
 def get_local_ip():
-    lines = subprocess.check_output('ifconfig').decode('utf').splitlines()
-    lines = [line for line in lines if 'inet ' in line]
-    addrs = [parse_first_ipv4(line) for line in lines]
+    fib_trie = open('/proc/net/fib_trie').read()
+    addrs = re.findall('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', fib_trie)
+    addrs = sorted(list(set(addrs)))
+    addrs = [ip for ip in addrs if not ip.startswith('127.') and not ip.endswith('.0')
+        and not ip.endswith('.255')]
     if not addrs:
-        return None
-    return has_prefix('10.', addrs) or has_prefix('192.', addrs) or addrs[0]
+        raise ValueError('No IPv4 address available')
+    ten_addrs = [ip for ip in addrs if ip.startswith('10.')]
+    if ten_addrs:
+        return ten_addrs[-1]
+    return addrs[-1]
 
 
 def has_prefix(prefix, addrs):
