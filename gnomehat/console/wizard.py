@@ -46,17 +46,6 @@ def prompt_create_experiments_dir():
     ############## Environment/Toolchain Configuration ################
     print('Checking for CUDA/CuDNN installation...')
     result = subprocess.run('gnomehat_doctor')
-    if result.returncode != 0:
-        print('CUDA or CuDNN is not currently installed. Install them now?')
-        selection = read_option({
-            'install': 'Download and install CUDA and CUDNN',
-            'nothing': 'Do nothing',
-        })
-        if selection == 'install':
-            subprocess.run(['sudo', 'gnomehat_install_cuda_cudnn'])
-            subprocess.run('gnomehat_doctor')
-    else:
-        print('CUDA and CuDNN are available')
 
     print("")
     print('Which way would you like Gnomehat to run Python?')

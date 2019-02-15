@@ -40,7 +40,6 @@ setup(name='gnomehat',
         'scripts/gnomehat_cleanup',
         'scripts/gnomehat_install_standalone_python',
         'scripts/gnomehat_websocket',
-        'scripts/gnomehat_install_cuda_cudnn',
         'scripts/gnomehat_doctor',
     ],
     install_requires=[

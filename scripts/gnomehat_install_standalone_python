@@ -35,4 +35,7 @@ echo "Editing Python version..."
 yes | $INSTALL_PATH/bin/conda install python=3.6
 echo "Python downgraded to 3.6"
 
+# Install CUDA and CuDNN
+$INSTALL_PATH/bin/conda install cudatoolkit==9.0 cudnn==7.3.1
+
 echo "Miniconda install complete"
