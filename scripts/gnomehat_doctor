@@ -31,11 +31,11 @@ NVIDIA_DRIVER_VERSION=$(nvidia-smi --help | head -1)
 green "NVIDIA driver version is: $NVIDIA_DRIVER_VERSION"
 
 
-NVCC_VERSION=$(nvcc --version | grep release)
-if [ "$NVCC_VERSION" ]; then
-    green "CUDA is installed with compiler version: $NVCC_VERSION"
+CUDA_VERSION=$(ldconfig -p | grep libcuda.so)
+if [ "$CUDA_VERSION" ]; then
+    green "CUDA is installed with compiler version: $CUDA_VERSION"
 else
-    warn_msg "Warning: Could not find nvcc. Check that CUDA is installed and /usr/local/cuda is included in PATH"
+    warn_msg "Warning: Could not find nvcc."
 fi
 
 
@@ -43,29 +43,8 @@ CUDNN_VERSION=$(ldconfig -p | grep libcudnn)
 if [ "$CUDNN_VERSION" ]; then
     green "CUDNN is installed at: $CUDNN_VERSION"
 else
-    warn_msg "Warning: Could not find libcudnn.so; Tensorflow and Keras will break (PyTorch should be OK)"
+    warn_msg "Warning: Could not find libcudnn.so; Tensorflow and Keras may fail"
 fi
-
-
-#green "\n\nChecking for ~/.nv cache..."
-#if [ -e $HOME/.nv ]; then
-#    echo "Caution: stale NVIDIA cache at $HOME/.nv"
-#    read -p "Delete cache? " -n 1 -r
-#    if [[ $REPLY =~ ^[Yy]$ ]]; then
-#        rm -rf ~/.nv/
-#    fi
-#fi
-
-
-#function enable_persistence_mode() {
-#    echo "Caution: persistence mode is not enabled. Enabling persistence mode may alleviate crashes on some systems."
-#    read -p "Enable persistence mode? " -n 1 -r
-#    if [[ $REPLY =~ ^[Yy]$ ]]; then
-#        sudo nvidia-smi -pm ENABLED
-#    fi
-#}
-#(nvidia-smi -q | grep -i Persistence.*Enabled) && green "\nPersistence mode is enabled" || enable_persistence_mode
-#echo
 
 if [ ! -z "$WARNINGS" ]; then
     echo "Found the following potential issues:"
