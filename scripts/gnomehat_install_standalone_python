@@ -38,4 +38,7 @@ echo "Python downgraded to 3.6"
 # Install CUDA and CuDNN
 $INSTALL_PATH/bin/conda install cudatoolkit==9.0 cudnn==7.3.1
 
+# Install ffmpeg
+$INSTALL_PATH/bin/conda install ffmpeg
+
 echo "Miniconda install complete"
