@@ -53,14 +53,12 @@ def getinfo():
     return json.dumps(info)
 
 
-# TODO: find a better name for this function
-def gpu_is_in_use(gpu_id):
-    cmd = ['nvidia-smi', '-q', '-i', str(gpu_id)]
-    text = subprocess.check_output(cmd)
-    text = str(text)
-    if 'Used GPU Memory' in text:
-        return True
-    return False
+def gpu_is_in_use(gpu_id, threshold_memory_use_percent=10.0):
+    gpu_id = int(gpu_id)
+    cmd = "nvidia-smi -q -i {} | egrep Memory.*% | awk '{{print $3}}'".format(gpu_id)
+    text = subprocess.check_output(cmd, shell=True)
+    memory_used = float(text)
+    return memory_used >= threshold_memory_use_percent
 
 
 def run_experiments(experiments_dir):
