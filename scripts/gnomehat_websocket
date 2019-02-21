@@ -21,7 +21,7 @@ import select
 from gnomehat import server_config
 
 experiments_dir = None
-TAIL_LINES = 500
+TAIL_LINES = 200
 
 @asyncio.coroutine
 def serve_public_client(websocket, path):
@@ -65,7 +65,6 @@ def serve_public_client(websocket, path):
         if proc_output:
             line = str(proc_output, 'utf-8')
             yield from websocket.send(line)
-            yield from asyncio.sleep(.001)
         else:
             yield from asyncio.sleep(.1)
 
