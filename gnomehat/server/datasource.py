@@ -206,13 +206,13 @@ def get_notes(dir_path):
 def get_completion_stats(dir_path):
     summary_filename = os.path.join(config['EXPERIMENTS_DIR'], dir_path, '.last_summary.log')
     if not os.path.exists(summary_filename):
-        return None
+        return ''
     # Look for the TQDM line and parse it, if possible
     try:
         cmd = ['grep', '|.*|.*/.*\[.*\]', summary_filename]
         summary_line = str(subprocess.check_output(cmd), 'utf-8')
     except subprocess.CalledProcessError:
-        return None
+        return ''
     percentage_complete = summary_line.split('%')[0]
     elapsed_remaining = summary_line.split('[')[1].split(',')[0]
     time_elapsed, time_remaining = elapsed_remaining.split('<')
