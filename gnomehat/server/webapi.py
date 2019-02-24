@@ -243,6 +243,7 @@ def view_experiment(experiment_namespace, experiment_id):
         'experiment_id': experiment_id,
         'experiment_namespace': experiment_namespace,
         'experiment_notes': datasource.get_notes(os.path.join(experiment_namespace, experiment_id)),
+        'completion_stats': datasource.get_completion_stats(os.path.join(experiment_namespace, experiment_id)),
         'files_url': files_url,
         'image_groups': image_groups,
         'websocket_host': websocket_host(),
