@@ -20,9 +20,6 @@ from gnomehat.server import app, config
 from gnomehat.server import datasource
 from gnomehat.server.datasource import get_results, get_images, get_all_experiment_metrics, get_directory_listing, get_worker_count, get_namespaces
 
-# TODO: Rest of world
-TIMEZONE = 'US/Pacific'
-
 
 @app.route('/')
 def front_page():
