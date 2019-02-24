@@ -154,6 +154,7 @@ def experiment_from_filesystem(dir_path, files_url):
         'experiment_name': experiment_name,
         'headline': headline,
         'subtitle': subtitle,
+        'notes': notes,
         'dir_name': experiment_id,
         'name': experiment_id.replace('_', ' '),
         'start_timestamp': timestamp,

@@ -245,6 +245,7 @@ def view_experiment(experiment_namespace, experiment_id):
     kwargs = {
         'experiment_id': experiment_id,
         'experiment_namespace': experiment_namespace,
+        'experiment_notes': datasource.get_notes(os.path.join(experiment_namespace, experiment_id)),
         'files_url': files_url,
         'image_groups': image_groups,
         'websocket_host': websocket_host(),
@@ -262,6 +263,7 @@ def view_experiment_listing(experiment_namespace, experiment_id):
         'cwd': experiment_id,
         'experiment_namespace': experiment_namespace,
         'experiment_id': experiment_id,
+        'experiment_notes': datasource.get_notes(os.path.join(experiment_namespace, experiment_id)),
         'files_url': get_files_url(experiment_namespace),
     }
     return flask.render_template('experiment_listing.html', **kwargs)
