@@ -57,6 +57,9 @@ def copy_repo(target_dir):
     # Check that this is a git repository
     try:
         subprocess.check_output(['git', 'describe', '--always'])
+        repo_root = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'])
+        repo_root = str(repo_root, 'utf-8').strip()
+        print('Discovered repository root at {}'.format(repo_root))
     except subprocess.CalledProcessError:
         print('Error: {} is not a git repository'.format(os.getcwd()))
         print('To use gnomehat, make sure your source code is checked into git')
@@ -66,13 +69,18 @@ def copy_repo(target_dir):
         print('    git commit')
         exit(1)
 
+    # Find the root directory of this repo, and our cwd relative to it
+    unmatched_prefix, _, relative_cwd = os.getcwd().partition(repo_root)
+    if unmatched_prefix:
+        print('Warning: repository root directory does not match cwd, check symbolic links')
+
     # Shallow-clone the cwd repository to target_dir
     # This preserves branch name and commit hash, but skips history
     # Note: git-clone is finnicky and requires us to chdir to the target
     source_dir = os.getcwd()
     mkdirp(target_dir)
     os.chdir(target_dir)
-    clone_cmd = ['git', 'clone', '--depth=1', 'file://{}'.format(source_dir), '.']
+    clone_cmd = ['git', 'clone', '--depth=1', 'file://{}'.format(repo_root), '.']
     subprocess.check_output(clone_cmd, stderr=subprocess.STDOUT)
     os.chdir(source_dir)
 
@@ -86,16 +94,18 @@ def copy_repo(target_dir):
         mkdirp(os.path.dirname(dst_filename))
         shutil.copy2(src_filename, dst_filename)
     log('Copied {} files to {}'.format(len(filenames), target_dir))
+    return relative_cwd
 
 
-def build_start_sh(command, args):
-    # TODO: Replace this with something more structured
-    return '''#!/bin/bash
+START_SH_TEMPLATE = '''#!/bin/bash
 if [ -f requirements.txt ]; then
   pip install -r requirements.txt
 fi
+cd ./{}
 script -q -c '{} {}' /dev/null
-'''.format(command, ' '.join(args))
+'''
+def build_start_sh(relative_cwd, command, args):
+    return START_SH_TEMPLATE.format(relative_cwd, command, ' '.join(args))
 
 
 def chmodx(filename):
@@ -171,8 +181,9 @@ def gnomehat_run(options):
     target_dir = os.path.join(namespace_dir, experiment_name)
     if options['ignore-git']:
         mkdirp(target_dir)
+        repo_relative_cwd = '.'
     else:
-        copy_repo(target_dir)
+        repo_relative_cwd = copy_repo(target_dir)
 
     # Write a .sh script containing the user-supplied command to be run
     os.chdir(target_dir)
@@ -180,7 +191,7 @@ def gnomehat_run(options):
     command = options['executable']
     args = options['args']
     with open('gnomehat_start.sh', 'w') as fp:
-        fp.write(build_start_sh(command, args))
+        fp.write(build_start_sh(repo_relative_cwd, command, args))
     chmodx('gnomehat_start.sh')
 
     with open('gnomehat_notes.txt', 'w') as fp:

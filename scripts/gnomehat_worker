@@ -181,8 +181,8 @@ def get_timestamp():
 def main(experiments_dir):
     gpu = get_gpu()
     log('Worker starting with GPU {} in {}'.format(gpu, experiments_dir))
-    os.chdir(experiments_dir)
     while True:
+        os.chdir(experiments_dir)
         log('Worker looking for jobs...')
         for namespace in os.listdir(experiments_dir):
             namespace_dir = os.path.join(experiments_dir, namespace)
