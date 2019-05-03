@@ -223,7 +223,11 @@ def get_completion_stats(dir_path):
 def get_command(dir_path):
     start_path = os.path.join(dir_path, 'gnomehat_start.sh')
     lines = open(start_path).readlines()
-    command = lines[-1].replace("script -q -c '", '').replace("' /dev/null", "")
+    if not lines:
+        return ''
+    SCRIPT_LEFT = "script -q -c '"
+    SCRIPT_RIGHT = "' /dev/null"
+    command = lines[-1].replace(SCRIPT_LEFT, '').replace(SCRIPT_RIGHT, "")
     return command
 
 
