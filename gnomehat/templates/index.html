@@ -85,7 +85,7 @@ function saveNotes(experiment_id) {
               </a>
                 <br>
                 <div class="inputbox">
-                    <input onfocusout="saveNotes('{{result['dir_name']}}')" type="text" id="notes_{{result['dir_name']}}" value="{{result['subtitle']}}"></input>
+                    <input autocomplete="off" onfocusout="saveNotes('{{result['dir_name']}}')" type="text" id="notes_{{result['dir_name']}}" value="{{result['subtitle']}}"></input>
                   <button onclick="saveNotes('{{result['dir_name']}}')">Save</button>
                 </div>
             </span>
