@@ -38,6 +38,7 @@ def nv_id_to_name(device_id):
             '1c8d':    'GP107 [GeForce GTX 1050 Mobile]',
             '1d01':    'GP108 [GeForce GT 1030]',
             '1d10':    'GP108 [GeForce MX150]',
+            '1db8':    'GV100 [Tesla V100-SXM3]',
     }.get(device_id, 'NVIDIA {}'.format(device_id))
 
 
@@ -74,7 +75,7 @@ def get_mb_info():
 
 
 def get_gpu_info():
-    nv_lines = run('lspci -vv | grep "VGA compatible controller: NVIDIA"')
+    nv_lines = run('lspci -vv | grep "controller: NVIDIA"')
     gpu_info = []
     for line in nv_lines.splitlines():
         device_id = line.split()[7]
