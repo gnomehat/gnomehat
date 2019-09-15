@@ -47,17 +47,22 @@ def run(x):
         output_bytes = check_output(x, shell=True)
         return output_bytes.decode('utf-8').replace('\t', ' ').strip('\n')
     except:
-        return "<error>"
+        print('Failed to run command: {}'.format(x))
+        return None
 
 
 def get_cpu_info():
     cpu_info = run('cat /proc/cpuinfo | grep "model name" | uniq')
+    if cpu_info is None:
+        return "<unknown>"
     cpu_info = cpu_info.split(':')[-1].strip()
     return cpu_info
 
 
 def get_ram_info():
     ram_lines = run('sudo dmidecode  -t memory | egrep "[^ ](Size|Speed)." | grep -v Unknown | grep -v "No Module Installed" | paste - - -d\;')
+    if ram_lines is None:
+        return []
     ram_info = []
     for line in ram_lines.splitlines():
         if ';' in line:
@@ -70,12 +75,16 @@ def get_ram_info():
 
 def get_mb_info():
     mb_info = run('sudo dmidecode -t 2 | grep "Product Name"')
+    if mb_info is None:
+        return []
     mb_info = mb_info.split('Product Name: ')[-1]
     return mb_info
 
 
 def get_gpu_info():
     nv_lines = run('lspci -vv | grep "controller: NVIDIA"')
+    if nv_lines is None:
+        return []
     gpu_info = []
     for line in nv_lines.splitlines():
         device_id = line.split()[7]
@@ -87,6 +96,8 @@ def get_gpu_info():
 
 def get_ubuntu_version():
     ubuntu_version = run('lsb_release -a 2>/dev/null | grep Release | grep -o [0-9].*')
+    if ubuntu_version is None:
+        return "<unknown>"
     return ubuntu_version
 
 
